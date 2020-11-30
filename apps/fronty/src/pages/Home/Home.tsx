@@ -40,12 +40,7 @@ const Home = () => {
   return (
     <Container>
       <ContentWrapper>
-        <Input
-          type="text"
-          placeholder="Enter your name"
-          value={username}
-          onChange={handleUsernameChange}
-        />
+        <Input type="text" placeholder="Enter your name" value={username} onChange={handleUsernameChange} />
         <Input type="text" placeholder="Room" value={roomName} onChange={handleRoomNameChange} />
         <Link to={`/${roomName}`} className="enter-room-button" onClick={handleRoomJoin}>
           Join room

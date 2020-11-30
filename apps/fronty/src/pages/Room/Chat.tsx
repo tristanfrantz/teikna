@@ -2,17 +2,11 @@ import React, { KeyboardEvent, ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import useSocketChat from '../../hooks/useSocketChat';
 import { Message } from '@teikna/interfaces';
-import {
-  MessageContent,
-  MessageInput,
-  MessageItem,
-  MessageList,
-  MessageSender,
-  MessageWrapper,
-} from './Room.styles';
+import { UserMessage, MessageInput, MessageItem, MessageList, MessageSender, MessageWrapper } from './Room.styles';
+import { MessageType } from '@teikna/enums';
 
 const Chat = () => {
-  const { messages, sendMessage } = useSocketChat();
+  const { messages, sendMessage, hasGuessedWord } = useSocketChat();
   const { handleSubmit } = useForm();
   const [newMessage, setNewMessage] = React.useState('');
 
@@ -30,15 +24,13 @@ const Chat = () => {
   return (
     <MessageWrapper>
       <MessageList>
-        {messages.map((message: Message) => {
+        {messages.map((message: Message, index: number) => {
           const { user, content, timestamp } = message;
           return (
-            <MessageItem key={timestamp.getTime()}>
+            <MessageItem key={index}>
               <div>
-                <MessageSender>{`${
-                  user?.name ?? 'some ugly dude'
-                }: `}</MessageSender>
-                <MessageContent>{content}</MessageContent>
+                {message.type === MessageType.USERMESSAGE && <MessageSender>{`${user?.name}: `}</MessageSender>}
+                <UserMessage type={message.type}>{content}</UserMessage>
               </div>
             </MessageItem>
           );

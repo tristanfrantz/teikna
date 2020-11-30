@@ -10,9 +10,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "libs/types/**/*.ts"
-            ]
+            "lintFilePatterns": ["libs/types/**/*.ts"]
           }
         }
       }
@@ -30,9 +28,7 @@
             "outputPath": "dist/apps/backy",
             "main": "apps/backy/src/main.ts",
             "tsConfig": "apps/backy/tsconfig.app.json",
-            "assets": [
-              "apps/backy/src/assets"
-            ]
+            "assets": ["apps/backy/src/assets"]
           },
           "configurations": {
             "production": {
@@ -57,9 +53,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/backy/**/*.ts"
-            ]
+            "lintFilePatterns": ["apps/backy/**/*.ts"]
           }
         }
       }
@@ -78,10 +72,6 @@
             "main": "apps/fronty/src/main.tsx",
             "polyfills": "apps/fronty/src/polyfills.ts",
             "tsConfig": "apps/fronty/tsconfig.app.json",
-            "assets": [
-              "apps/fronty/src/favicon.ico",
-              "apps/fronty/src/assets"
-            ],
             "styles": [],
             "scripts": [],
             "webpackConfig": "@nrwl/react/plugins/webpack"
@@ -126,9 +116,7 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": [
-              "apps/fronty/**/*.{ts,tsx,js,jsx}"
-            ]
+            "lintFilePatterns": ["apps/fronty/**/*.{ts,tsx,js,jsx}"]
           }
         }
       }

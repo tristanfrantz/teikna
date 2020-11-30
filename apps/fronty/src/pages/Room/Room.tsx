@@ -19,7 +19,7 @@ const users: User[] = [
     score: 5060,
     img: 'https://assets.change.org/photos/6/iy/iv/OMIYIvOcNvINScL-800x450-noPad.jpg?1595872321',
     hasGuessedWord: false,
-    room: "bingo"
+    room: 'bingo',
   },
   {
     id: '1',
@@ -27,7 +27,7 @@ const users: User[] = [
     score: 4250,
     img: 'https://assets.change.org/photos/6/iy/iv/OMIYIvOcNvINScL-800x450-noPad.jpg?1595872321',
     hasGuessedWord: true,
-    room: "bingo"
+    room: 'bingo',
   },
   {
     id: '1',
@@ -35,7 +35,7 @@ const users: User[] = [
     score: 9520,
     img: 'https://assets.change.org/photos/6/iy/iv/OMIYIvOcNvINScL-800x450-noPad.jpg?1595872321',
     hasGuessedWord: false,
-    room: "bingo"
+    room: 'bingo',
   },
   {
     id: '1',
@@ -43,7 +43,7 @@ const users: User[] = [
     score: 100,
     img: 'https://assets.change.org/photos/6/iy/iv/OMIYIvOcNvINScL-800x450-noPad.jpg?1595872321',
     hasGuessedWord: false,
-    room: "bingo"
+    room: 'bingo',
   },
   {
     id: '1',
@@ -51,25 +51,15 @@ const users: User[] = [
     score: 2313,
     img: 'https://assets.change.org/photos/6/iy/iv/OMIYIvOcNvINScL-800x450-noPad.jpg?1595872321',
     hasGuessedWord: true,
-    room: "bingo"
+    room: 'bingo',
   },
 ];
 
-const mockRoom: Room = {
-  id: '',
-  users: {},
-  wordListId: '',
-  selectedWord: 'poopy',
-  selectedUser: users[1],
-  roundCount: 4,
-  currentRound: 2,
-};
-
 const ChatRoom = () => {
   const { roomId } = useParams<RoomRouteParams>();
-  const { socket, user } = useRoomSocket(roomId);
+  const { socket, user, room } = useRoomSocket(roomId);
 
-  if (!socket || !user) {
+  if (!socket || !user || !room) {
     return <div>Loading or failure</div>;
   }
 
@@ -84,10 +74,11 @@ const ChatRoom = () => {
                   'https://images.vexels.com/media/users/3/192919/isolated/preview/28fece9fbbd599d507ecd28c8febacf8-stopwatch-timer-stroke-icon-stopwatch-by-vexels.png'
                 }
               />
-              <Round>{`Round ${mockRoom.currentRound} of ${mockRoom.roundCount}`}</Round>
+              <Round>{`Round ${room.currentRound} of ${room.roundCount}`}</Round>
+              <button onClick={() => console.log('hi')}>start round 👨</button>
             </Header>
             <ContentWrapper>
-              <Users users={users} />
+              <Users users={Object.values(room.users)} />
               <CanvasWrapper>
                 <DrawingBoard />
               </CanvasWrapper>

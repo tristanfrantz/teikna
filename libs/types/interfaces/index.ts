@@ -1,3 +1,5 @@
+import { MessageType } from '../enums/messageType';
+
 export interface Coordinates {
   x: number;
   y: number;
@@ -8,6 +10,7 @@ export interface DrawData {
   end: Coordinates;
   color: string;
   lineWidth: number;
+  room: string;
 }
 
 export interface User {
@@ -23,8 +26,8 @@ export interface Room {
   id: string;
   users: Record<string, User>;
   wordListId: string;
-  selectedWord: string;
-  selectedUser: User;
+  correctGuess: string;
+  drawingUser: User;
   roundCount: number;
   currentRound: number;
 }
@@ -33,4 +36,5 @@ export interface Message {
   user: User;
   content: string;
   timestamp: Date;
+  type?: MessageType;
 }

@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import { MessageType } from '@teikna/enums';
+import styled, { css } from 'styled-components';
 
 export const RoomWrapper = styled.div`
   width: 1400px;
@@ -72,8 +73,22 @@ export const MessageSender = styled.span`
   font-weight: 600;
 `;
 
-export const MessageContent = styled.span`
+export const UserMessage = styled.span<{ type: MessageType }>`
   word-wrap: break-word;
+
+  ${(p) =>
+    p.type === MessageType.SERVERMESSAGE &&
+    css`
+      color: green;
+      font-weight: 600;
+    `}
+
+  ${(p) =>
+    p.type === MessageType.PRIVATEMESSAGE &&
+    css`
+      color: brown;
+      font-weight: 600;
+    `}
 `;
 
 export const MessageInput = styled.input`
