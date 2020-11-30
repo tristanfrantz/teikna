@@ -32,7 +32,10 @@ export class MessageService {
   public emitMessage = (message: Message, socket: Socket) => {
     const { user, content } = message;
     const messageContent = new MessageModel(user, content, MessageType.USERMESSAGE);
-    socket.to(user.room).broadcast.emit(MessageEvent.MESSAGE, messageContent);
+
+    if (user) {
+      socket.to(user.room).broadcast.emit(MessageEvent.MESSAGE, messageContent);
+    } 
   };
 
   /** these next 3 are server messages, user set to null since we dont want any user to send these */
@@ -53,7 +56,9 @@ export class MessageService {
     const { content, user } = message;
     const messageContent = `'${content}' is close!`;
     const closeGuessMessage = new MessageModel(null, messageContent, MessageType.PRIVATEMESSAGE);
-    socket.to(user.id).emit(MessageEvent.CLOSEGUESS, closeGuessMessage);
+    if (user) {
+      socket.to(user.id).emit(MessageEvent.CLOSEGUESS, closeGuessMessage);
+    }
   };
 
   public emitWordsToUser = (words: string[], userId: string) => {

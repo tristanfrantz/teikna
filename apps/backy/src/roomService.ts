@@ -43,18 +43,20 @@ export class RoomService {
 
   public handleMessage = (message: Message, socket: Socket) => {
     const { user, content } = message;
-    const userRoom = this.rooms[user.room];
-    if (userRoom) {
-      const selectedWord = userRoom.correctGuess;
-      const wordSimilarity = compareTwoStrings(selectedWord, content);
-      if (wordSimilarity === 1) {
-        userRoom.users[user.id].hasGuessedWord = true;
-        userRoom.users[user.id].score += 100;
-        this.messageService.emitCorrectGuess(user);
-      } else if (wordSimilarity >= 0.8) {
-        this.messageService.emitCloseGuess(message, socket);
-      } else {
-        this.messageService.emitMessage(message, socket);
+    if (user) {
+      const userRoom = this.rooms[user.room];
+      if (userRoom) {
+        const selectedWord = userRoom.correctGuess;
+        const wordSimilarity = compareTwoStrings(selectedWord, content);
+        if (wordSimilarity === 1) {
+          userRoom.users[user.id].hasGuessedWord = true;
+          userRoom.users[user.id].score += 100;
+          this.messageService.emitCorrectGuess(user);
+        } else if (wordSimilarity >= 0.8) {
+          this.messageService.emitCloseGuess(message, socket);
+        } else {
+          this.messageService.emitMessage(message, socket);
+        }
       }
     }
   };

@@ -73,7 +73,7 @@ export const MessageSender = styled.span`
   font-weight: 600;
 `;
 
-export const UserMessage = styled.span<{ type: MessageType }>`
+export const UserMessage = styled.span<{ type?: MessageType }>`
   word-wrap: break-word;
 
   ${(p) =>

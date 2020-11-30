@@ -1,4 +1,4 @@
-import { MessageType } from '../enums/messageType';
+import { MessageType } from '@teikna/enums';
 
 export interface Coordinates {
   x: number;
@@ -33,7 +33,7 @@ export interface Room {
 }
 
 export interface Message {
-  user: User;
+  user: User | null;
   content: string;
   timestamp: Date;
   type?: MessageType;
