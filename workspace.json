@@ -1,37 +1,9 @@
 {
   "version": 1,
   "projects": {
-    "teikna-e2e": {
-      "root": "apps/teikna-e2e",
-      "sourceRoot": "apps/teikna-e2e/src",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/teikna-e2e/cypress.json",
-            "tsConfig": "apps/teikna-e2e/tsconfig.e2e.json",
-            "devServerTarget": "fronty:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "fronty:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": [
-              "apps/teikna-e2e/**/*.{js,ts}"
-            ]
-          }
-        }
-      }
-    },
-    "api-interfaces": {
-      "root": "libs/api-interfaces",
-      "sourceRoot": "libs/api-interfaces/src",
+    "types": {
+      "root": "libs/types",
+      "sourceRoot": "libs/types/src",
       "projectType": "library",
       "schematics": {},
       "architect": {
@@ -39,15 +11,8 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": [
-              "libs/api-interfaces/**/*.ts"
+              "libs/types/**/*.ts"
             ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/api-interfaces/jest.config.js",
-            "passWithNoTests": true
           }
         }
       }
@@ -95,13 +60,6 @@
             "lintFilePatterns": [
               "apps/backy/**/*.ts"
             ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "apps/backy/jest.config.js",
-            "passWithNoTests": true
           }
         }
       }
@@ -171,13 +129,6 @@
             "lintFilePatterns": [
               "apps/fronty/**/*.{ts,tsx,js,jsx}"
             ]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "apps/fronty/jest.config.js",
-            "passWithNoTests": true
           }
         }
       }

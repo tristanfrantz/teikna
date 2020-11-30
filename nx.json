@@ -28,13 +28,7 @@
     }
   },
   "projects": {
-    "teikna-e2e": {
-      "tags": [],
-      "implicitDependencies": [
-        "fronty"
-      ]
-    },
-    "api-interfaces": {
+    "types": {
       "tags": []
     },
     "backy": {

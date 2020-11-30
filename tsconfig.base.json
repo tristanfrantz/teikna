@@ -18,8 +18,8 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@teikna/interfaces": ["libs/interfaces/index.ts"],
-      "@teikna/enums": ["libs/enums/index.ts"]
+      "@teikna/interfaces": ["libs/types/interfaces/index.ts"],
+      "@teikna/enums": ["libs/types/enums/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
