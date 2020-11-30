@@ -20,15 +20,10 @@ const Chat = () => {
     setNewMessage(event.target.value);
   };
 
-  const handleSendMessage = () => {
-    sendMessage(newMessage);
-    setNewMessage('');
-  };
-
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
-      console.log('only enter sir');
-      handleSendMessage();
+      sendMessage(newMessage);
+      setNewMessage('');
     }
   };
 
@@ -36,27 +31,27 @@ const Chat = () => {
     <MessageWrapper>
       <MessageList>
         {messages.map((message: Message) => {
-          const { user, content } = message;
+          const { user, content, timestamp } = message;
           return (
-            <MessageItem>
+            <MessageItem key={timestamp.getTime()}>
               <div>
-                <MessageSender>{`${user?.name ?? 'some ugly dude'}: `}</MessageSender>
+                <MessageSender>{`${
+                  user?.name ?? 'some ugly dude'
+                }: `}</MessageSender>
                 <MessageContent>{content}</MessageContent>
               </div>
             </MessageItem>
           );
         })}
       </MessageList>
-      <form onSubmit={handleSubmit(handleSendMessage)}>
-        <MessageInput
-          type="text"
-          maxLength={60}
-          onKeyPress={handleKeyPress}
-          value={newMessage}
-          onInput={handleNewMessageChange}
-          placeholder="Write message..."
-        />
-      </form>
+      <MessageInput
+        type="text"
+        maxLength={60}
+        onKeyPress={handleKeyPress}
+        value={newMessage}
+        onInput={handleNewMessageChange}
+        placeholder="Write message..."
+      />
     </MessageWrapper>
   );
 };
