@@ -1,4 +1,4 @@
-import { MessageType } from '../enums/messageType';
+import { MessageType } from '@teikna/enums';
 
 export interface Coordinates {
   x: number;

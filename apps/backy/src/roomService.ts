@@ -1,7 +1,4 @@
-import { DrawData, Message, Room, User } from '@teikna/interfaces';
-import { Socket, Server } from 'socket.io';
-import { MessageService } from './messageService';
-import { compareTwoStrings } from 'string-similarity';
+import { Room, User } from '@teikna/interfaces';
 import { words } from './words';
 
 export class RoomService {
@@ -26,7 +23,6 @@ export class RoomService {
     if (userRoom) {
       const users = userRoom.users;
       users[id] = user;
-      const updateUserList = Object.values(users).filter((u) => u.roomId === user.roomId);
     } else {
       this.rooms[room] = this.generateTemplateRoom(user);
     }

@@ -27,8 +27,7 @@
           "options": {
             "outputPath": "dist/apps/backy",
             "main": "apps/backy/src/main.ts",
-            "tsConfig": "apps/backy/tsconfig.app.json",
-            "assets": ["apps/backy/src/assets"]
+            "tsConfig": "apps/backy/tsconfig.app.json"
           },
           "configurations": {
             "production": {
