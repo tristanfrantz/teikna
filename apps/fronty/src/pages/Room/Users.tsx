@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { User } from '@teikna/interfaces';
+import { UserMessage } from './Room.styles';
+import useSocketCanvas from '../../hooks/useSocketCanvas';
+import { SocketContext } from '../../context';
+import { MessageEvent, RoomEvent } from '@teikna/enums';
 
 const List = styled.div`
   display: flex;
@@ -53,7 +57,17 @@ const Score = styled.span`
   font-weight: 500;
 `;
 
-export const Users: React.FC<{ users: User[] }> = ({ users }) => {
+const Users = () => {
+  const [users, setUsers] = useState<User[]>([]);
+
+  const socket = useContext(SocketContext);
+
+  useEffect(() => {
+    socket.on(MessageEvent.USERLIST, (users: User[]) => {
+      setUsers(users);
+    });
+  }, []);
+
   return (
     <UserList>
       {users.map((user: User, index: number) => (
@@ -71,3 +85,5 @@ export const Users: React.FC<{ users: User[] }> = ({ users }) => {
     </UserList>
   );
 };
+
+export default Users;

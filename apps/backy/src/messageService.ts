@@ -14,12 +14,12 @@ export class MessageService {
     const { name, id } = user;
     const content = `${name} has joined the room`;
     const userJoinedMessage = new MessageModel(user, content, MessageType.SERVERMESSAGE);
-    socket.to(user.room).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
+    socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
     socket.emit(RoomEvent.JOINROOM, room);
   };
 
   public emitUserLeft = (user: User, socket: Socket) => {
-    const { name, room } = user;
+    const { name, roomId: room } = user;
     const content = `${name} has left the room`;
     const userLeftMessage = new MessageModel(user, content, MessageType.SERVERMESSAGE);
     socket.to(room).broadcast.emit(MessageEvent.MESSAGE, userLeftMessage);
@@ -32,7 +32,7 @@ export class MessageService {
   public emitMessage = (message: Message, socket: Socket) => {
     const { user, content } = message;
     const messageContent = new MessageModel(user, content, MessageType.USERMESSAGE);
-    socket.to(user.room).broadcast.emit(MessageEvent.MESSAGE, messageContent);
+    socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, messageContent);
   };
 
   /** these next 3 are server messages, user set to null since we dont want any user to send these */
@@ -43,7 +43,7 @@ export class MessageService {
   };
 
   public emitCorrectGuess = (user: User) => {
-    const { name, room } = user;
+    const { name, roomId: room } = user;
     const content = `${name} has guessed the word!`;
     const correctGuessMessage = new MessageModel(null, content, MessageType.SERVERMESSAGE);
     this.ioServer.to(room).emit(MessageEvent.CORRECTGUESS, correctGuessMessage);

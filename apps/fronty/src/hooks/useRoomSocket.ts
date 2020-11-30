@@ -15,7 +15,7 @@ const useRoomSocket = (roomId: string) => {
       const user: User = {
         id: socket.id,
         name: localStorage.getItem('name') ?? 'Userino',
-        room: roomId,
+        roomId: roomId,
         score: 0,
         hasGuessedWord: false,
       };

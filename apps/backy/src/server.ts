@@ -7,6 +7,8 @@ import { DrawData, Message, Room, User } from '@teikna/interfaces';
 import { RoomService } from './roomService';
 import cors from 'cors';
 
+import * as messageUtils from './utils';
+
 export default class ChatServer {
   private port = 8080;
   private app: express.Application;
@@ -22,7 +24,7 @@ export default class ChatServer {
     this.server = createServer(this.app);
     this.io = new SocketServer(this.server, { cors: { origin: '*' } });
     this.listen();
-    this.roomService = new RoomService(this.io);
+    this.roomService = new RoomService();
   }
 
   private listen(): void {
@@ -34,9 +36,18 @@ export default class ChatServer {
       console.log('someone connected');
 
       socket.on(RoomEvent.JOINROOM, (user: User) => {
-        socket.join(user.room);
-        this.users[socket.id] = user;
-        this.roomService.joinRoom(user, socket);
+        const { roomId } = user;
+        socket.join(roomId);
+        this.users[user.id] = user;
+
+        this.roomService.joinRoom(user);
+
+        const updatedRoomList = this.roomService.getRoomUsers(roomId);
+        const userJoinedMessage = messageUtils.userJoinedMessage(user);
+        const room = this.roomService.getRoom(roomId);
+        this.io.to(roomId).emit(MessageEvent.USERLIST, updatedRoomList);
+        socket.to(roomId).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
+        socket.emit(RoomEvent.JOINROOM, room);
       });
 
       socket.on(RoomEvent.CREATEROOM, (room: Room) => {
@@ -44,11 +55,25 @@ export default class ChatServer {
       });
 
       socket.on(MessageEvent.MESSAGE, (message: Message) => {
-        this.roomService.handleMessage(message, socket);
+        const { content, user } = message;
+        const room = this.roomService.getRoom(user.roomId);
+        if (room) {
+          const messageSimilarity = messageUtils.checkMessageSimilarity(room.correctGuess, content);
+          if (messageSimilarity === 1) {
+            const correctGuessMessage = messageUtils.correctGuessMessage(user);
+            socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, correctGuessMessage);
+          } else if (messageSimilarity >= 0.8) {
+            const closeGuessMessage = messageUtils.closeGuessMessage(message);
+            socket.emit(MessageEvent.CLOSEGUESS, closeGuessMessage);
+          } else {
+            const userMessage = messageUtils.userMessage(message);
+            socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, userMessage);
+          }
+        }
       });
 
       socket.on(MessageEvent.DRAW, (data: DrawData) => {
-        this.roomService.handleDraw(data, socket);
+        // this.roomService.handleDraw(data, socket);
       });
 
       // TODO FUNCS
@@ -71,17 +96,26 @@ export default class ChatServer {
         console.log('disconnecting');
         const user = this.users[socket.id];
         if (user) {
-          this.roomService.leaveRoom(user, socket);
+          this.roomService.leaveRoom(user);
+          const userLeaveMessage = messageUtils.userLeftMessage(user);
+          const updatedRoomList = this.roomService.updateRoomUserList(user);
+          socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userLeaveMessage);
+          socket.to(user.roomId).broadcast.emit(RoomEvent.LEAVEROOM, updatedRoomList);
         }
       });
 
       /** who the hell emits this event ?  drawer ? */
       socket.on(RoomEvent.ROUNDEND, (room: string) => {
-        this.roomService.handleRoundEnd(room);
+        // this.roomService.handleRoundEnd(room);
       });
 
-      socket.on(RoomEvent.ROUNDSTART, (room: string) => {
-        this.roomService.handleRoundStart(room);
+      socket.on(RoomEvent.ROUNDSTART, (roomId: string) => {
+        const room = this.roomService.getRoom(roomId);
+        if (room) {
+          this.roomService.handleRoundStart(roomId);
+          const threeRandomWords = this.roomService.getThreeRandomWords();
+          socket.to(room.drawingUser.id).emit(MessageEvent.WORDLIST, threeRandomWords);
+        }
       });
 
       socket.on(RoomEvent.SELECTWORD, (roomId: string, word: string) => {

@@ -16,7 +16,7 @@ export interface DrawData {
 export interface User {
   id: string;
   name: string;
-  room: string;
+  roomId: string;
   score: number;
   hasGuessedWord: boolean;
   img?: string;

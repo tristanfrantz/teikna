@@ -60,7 +60,7 @@ const useSocketCanvas = () => {
           y: evt.clientY - canvasOffsetTop,
         };
 
-        const data = { start, end, color: '#000', lineWidth: 2, room: user.room };
+        const data = { start, end, color: '#000', lineWidth: 2, room: user.roomId };
 
         drawLine(data);
         socket.emit(MessageEvent.DRAW, data);
