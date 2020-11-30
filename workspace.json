@@ -1,21 +1,129 @@
 {
   "version": 1,
   "projects": {
-    "teikna": {
-      "root": "apps/teikna",
-      "sourceRoot": "apps/teikna/src",
+    "teikna-e2e": {
+      "root": "apps/teikna-e2e",
+      "sourceRoot": "apps/teikna-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/teikna-e2e/cypress.json",
+            "tsConfig": "apps/teikna-e2e/tsconfig.e2e.json",
+            "devServerTarget": "fronty:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "fronty:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/teikna-e2e/**/*.{js,ts}"
+            ]
+          }
+        }
+      }
+    },
+    "api-interfaces": {
+      "root": "libs/api-interfaces",
+      "sourceRoot": "libs/api-interfaces/src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/api-interfaces/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/api-interfaces/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "backy": {
+      "root": "apps/backy",
+      "sourceRoot": "apps/backy/src",
+      "projectType": "application",
+      "prefix": "api",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/backy",
+            "main": "apps/backy/src/main.ts",
+            "tsConfig": "apps/backy/tsconfig.app.json",
+            "assets": [
+              "apps/backy/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/backy/src/environments/environment.ts",
+                  "with": "apps/backy/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "backy:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/backy/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/backy/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "fronty": {
+      "root": "apps/fronty",
+      "sourceRoot": "apps/fronty/src",
       "projectType": "application",
       "schematics": {},
       "architect": {
         "build": {
           "builder": "@nrwl/web:build",
           "options": {
-            "outputPath": "dist/apps/teikna",
-            "index": "apps/teikna/src/index.html",
-            "main": "apps/teikna/src/main.tsx",
-            "polyfills": "apps/teikna/src/polyfills.ts",
-            "tsConfig": "apps/teikna/tsconfig.app.json",
-            "assets": ["apps/teikna/src/favicon.ico", "apps/teikna/src/assets"],
+            "outputPath": "dist/apps/fronty",
+            "index": "apps/fronty/src/index.html",
+            "main": "apps/fronty/src/main.tsx",
+            "polyfills": "apps/fronty/src/polyfills.ts",
+            "tsConfig": "apps/fronty/tsconfig.app.json",
+            "assets": [
+              "apps/fronty/src/favicon.ico",
+              "apps/fronty/src/assets"
+            ],
             "styles": [],
             "scripts": [],
             "webpackConfig": "@nrwl/react/plugins/webpack"
@@ -24,8 +132,8 @@
             "production": {
               "fileReplacements": [
                 {
-                  "replace": "apps/teikna/src/environments/environment.ts",
-                  "with": "apps/teikna/src/environments/environment.prod.ts"
+                  "replace": "apps/fronty/src/environments/environment.ts",
+                  "with": "apps/fronty/src/environments/environment.prod.ts"
                 }
               ],
               "optimization": true,
@@ -48,122 +156,27 @@
         "serve": {
           "builder": "@nrwl/web:dev-server",
           "options": {
-            "buildTarget": "teikna:build",
-            "proxyConfig": "apps/teikna/proxy.conf.json"
+            "buildTarget": "fronty:build",
+            "proxyConfig": "apps/fronty/proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "buildTarget": "teikna:build:production"
+              "buildTarget": "fronty:build:production"
             }
           }
         },
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/teikna/**/*.{ts,tsx,js,jsx}"]
+            "lintFilePatterns": [
+              "apps/fronty/**/*.{ts,tsx,js,jsx}"
+            ]
           }
         },
         "test": {
           "builder": "@nrwl/jest:jest",
           "options": {
-            "jestConfig": "apps/teikna/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "teikna-e2e": {
-      "root": "apps/teikna-e2e",
-      "sourceRoot": "apps/teikna-e2e/src",
-      "projectType": "application",
-      "architect": {
-        "e2e": {
-          "builder": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/teikna-e2e/cypress.json",
-            "tsConfig": "apps/teikna-e2e/tsconfig.e2e.json",
-            "devServerTarget": "teikna:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "teikna:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/teikna-e2e/**/*.{js,ts}"]
-          }
-        }
-      }
-    },
-    "api": {
-      "root": "apps/api",
-      "sourceRoot": "apps/api/src",
-      "projectType": "application",
-      "prefix": "api",
-      "schematics": {},
-      "architect": {
-        "build": {
-          "builder": "@nrwl/node:build",
-          "options": {
-            "outputPath": "dist/apps/api",
-            "main": "apps/api/src/main.ts",
-            "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/api/src/environments/environment.ts",
-                  "with": "apps/api/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "builder": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "api:build"
-          }
-        },
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/api/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "apps/api/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "api-interfaces": {
-      "root": "libs/api-interfaces",
-      "sourceRoot": "libs/api-interfaces/src",
-      "projectType": "library",
-      "schematics": {},
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/api-interfaces/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "options": {
-            "jestConfig": "libs/api-interfaces/jest.config.js",
+            "jestConfig": "apps/fronty/jest.config.js",
             "passWithNoTests": true
           }
         }
@@ -189,5 +202,5 @@
       }
     }
   },
-  "defaultProject": "teikna"
+  "defaultProject": "fronty"
 }

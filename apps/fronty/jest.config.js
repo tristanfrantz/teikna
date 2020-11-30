@@ -1,5 +1,5 @@
 module.exports = {
-  displayName: 'teikna',
+  displayName: 'fronty',
   preset: '../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nrwl/react/plugins/jest',
@@ -9,5 +9,5 @@ module.exports = {
     ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/apps/teikna',
+  coverageDirectory: '../../coverage/apps/fronty',
 };

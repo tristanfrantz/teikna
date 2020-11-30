@@ -14,9 +14,12 @@
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@teikna/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+      "@teikna/interfaces": ["libs/interfaces/index.ts"],
+      "@teikna/enums": ["libs/enums/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

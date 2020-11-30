@@ -18,22 +18,29 @@
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"]
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e"
+        ]
       }
     }
   },
   "projects": {
-    "teikna": {
-      "tags": []
-    },
     "teikna-e2e": {
       "tags": [],
-      "implicitDependencies": ["teikna"]
-    },
-    "api": {
-      "tags": []
+      "implicitDependencies": [
+        "fronty"
+      ]
     },
     "api-interfaces": {
+      "tags": []
+    },
+    "backy": {
+      "tags": []
+    },
+    "fronty": {
       "tags": []
     }
   }
