@@ -1,7 +1,9 @@
 export enum RoomEvent {
   CONNECT = 'connect',
-  JOINROOM = 'join',
+  ROOMINFO = 'roominfo',
   CREATEROOM = 'createroom',
+  UPDATEROOM = 'updateroom',
+  JOINROOM = 'joinroom',
   LEAVEROOM = 'leave',
   DISCONNECT = 'disconnect',
   SELECTWORD = 'selectword',

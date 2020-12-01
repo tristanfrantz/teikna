@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from '../../components/Container';
 
@@ -14,9 +14,16 @@ const Input = styled.input`
   padding: ${(p) => p.theme.spacing}px;
 `;
 
+const CreateRoomButton = styled.button`
+  width: 100%;
+  padding: 12px;
+`;
+
 const Home = () => {
-  const [roomName, setRoomName] = React.useState('');
   const [username, setUsername] = React.useState('');
+  const roomName = '';
+
+  const history = useHistory();
 
   useEffect(() => {
     const savedUsername = localStorage.getItem('name');
@@ -25,25 +32,17 @@ const Home = () => {
     }
   }, []);
 
-  const handleRoomNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setRoomName(event.target.value);
-  };
-
   const handleUsernameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
-  };
-
-  const handleRoomJoin = () => {
-    localStorage.setItem('name', username);
+    localStorage.setItem('name', event.target.value);
   };
 
   return (
     <Container>
       <ContentWrapper>
         <Input type="text" placeholder="Enter your name" value={username} onChange={handleUsernameChange} />
-        <Input type="text" placeholder="Room" value={roomName} onChange={handleRoomNameChange} />
-        <Link to={`/${roomName}`} className="enter-room-button" onClick={handleRoomJoin}>
-          Join room
+        <Link to={`/room`} className="enter-room-button">
+          create a private room
         </Link>
       </ContentWrapper>
     </Container>

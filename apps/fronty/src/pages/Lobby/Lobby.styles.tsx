@@ -1,14 +1,5 @@
 import styled from 'styled-components';
-
-export const SettingsCard = styled.div`
-  width: 300px;
-  height: 300px;
-  background-color: white;
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  padding: 6px;
-`;
+import Card from '../../components/Card';
 
 export const SettingsTitle = styled.span`
   font-weight: 600;
@@ -44,4 +35,34 @@ export const StartGameButton = styled.button`
   border-radius: 4px;
   padding: 6px;
   margin-top: auto;
+`;
+
+export const PlayerContainer = styled.div`
+  display: flex;
+  width: 300px;
+  height: 300px;
+  flex-wrap: wrap;
+  margin-left: 12px;
+  border: 1px solid black;
+`;
+
+export const Player = styled(Card)`
+  width: 100px;
+  height: 100px;
+  margin: 4px;
+`;
+
+export const SettingsCard = styled(Card)<{ isAdmin: boolean }>`
+  width: 300px;
+  height: 300px;
+  flex-direction: column;
+  padding: 6px;
+
+  ${SelectInput} {
+    cursor: ${(p) => (p.isAdmin ? 'auto' : 'not-allowed')};
+  }
+
+  ${StartGameButton} {
+    cursor: ${(p) => (p.isAdmin ? 'auto' : 'not-allowed')};
+  }
 `;

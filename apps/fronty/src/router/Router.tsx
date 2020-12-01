@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import CreateRoom from '../pages/CreateRoom/CreateRoom';
+import Lobby from '../pages/Lobby/Lobby';
 
 import Home from '../pages/Home';
 import Room from '../pages/Room';
@@ -9,8 +9,7 @@ const AppRouter = () => (
   <Router>
     <Switch>
       <Route exact path="/" component={Home} />
-      <Route exact path="/create" component={CreateRoom} />
-      <Route exact path="/:roomId" component={Room} />
+      <Route exact path="/room/:roomId?" component={Lobby} />
     </Switch>
   </Router>
 );

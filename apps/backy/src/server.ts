@@ -33,25 +33,26 @@ export default class ChatServer {
     });
 
     this.io.on(RoomEvent.CONNECT, (socket: Socket) => {
-      console.log('someone connected');
-
       socket.on(RoomEvent.JOINROOM, (user: User) => {
-        const { roomId } = user;
-        socket.join(roomId);
+        socket.join(user.roomId);
         this.users[user.id] = user;
 
-        this.roomService.joinRoom(user);
-
-        const updatedRoomList = this.roomService.getRoomUsers(roomId);
         const userJoinedMessage = messageUtils.userJoinedMessage(user);
-        const room = this.roomService.getRoom(roomId);
-        this.io.to(roomId).emit(MessageEvent.USERLIST, updatedRoomList);
-        socket.to(roomId).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
-        socket.emit(RoomEvent.JOINROOM, room);
+        socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
+
+        const room = this.roomService.joinRoom(user);
+        this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, room);
       });
 
-      socket.on(RoomEvent.CREATEROOM, (room: Room) => {
-        this.roomService.createRoom(room);
+      socket.on(RoomEvent.CREATEROOM, (user: User) => {
+        const createdRoom = this.roomService.createRoom(user);
+        socket.join(createdRoom.id);
+        socket.emit(RoomEvent.ROOMINFO, createdRoom);
+      });
+
+      socket.on(RoomEvent.UPDATEROOM, (room: Room) => {
+        const updatedRoom = this.roomService.updateRoom(room);
+        this.io.to(room.id).emit(RoomEvent.ROOMINFO, updatedRoom);
       });
 
       socket.on(MessageEvent.MESSAGE, (message: Message) => {
@@ -93,14 +94,13 @@ export default class ChatServer {
       // });
 
       socket.on(RoomEvent.DISCONNECT, () => {
-        console.log('disconnecting');
         const user = this.users[socket.id];
         if (user) {
           this.roomService.leaveRoom(user);
+          const updatedRoomInfo = this.roomService.getRoom(user.roomId);
           const userLeaveMessage = messageUtils.userLeftMessage(user);
-          const updatedRoomList = this.roomService.updateRoomUserList(user);
           socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userLeaveMessage);
-          socket.to(user.roomId).broadcast.emit(RoomEvent.LEAVEROOM, updatedRoomList);
+          this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoomInfo);
         }
       });
 

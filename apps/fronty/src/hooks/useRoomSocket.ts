@@ -19,14 +19,25 @@ const useRoomSocket = (roomId: string) => {
         score: 0,
         hasGuessedWord: false,
       };
-      socket.emit(RoomEvent.JOINROOM, user);
-      setUser(user);
 
-      socket.on(RoomEvent.JOINROOM, (room: Room) => {
-        console.log('recieved this room: ', room);
-        setRoom(room);
+      if (roomId) {
+        socket.emit(RoomEvent.JOINROOM, user);
+        setUser(user);
+      } else {
+        console.log('creating room in client');
+        socket.emit(RoomEvent.CREATEROOM, user);
+      }
+
+      socket.on(RoomEvent.ROOMINFO, (roomInfo: Room) => {
+        setUser({ ...user, roomId: roomInfo.id });
+        setRoom(roomInfo);
+      });
+
+      socket.on(MessageEvent.USERLIST, (data: User[]) => {
+        console.log('recieved user list brother');
       });
     });
+
     // Disconnect socket when hook unmounts
     return () => {
       console.log('disconnecting socket inside useRoomSocket hook');

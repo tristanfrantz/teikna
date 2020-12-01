@@ -1,11 +1,24 @@
 import { Room, User } from '@teikna/interfaces';
 import { words } from './words';
+import { v4 as uuidv4 } from 'uuid';
+import { RoomModel, TemplateRoomModel } from '@teikna/models';
 
 export class RoomService {
   private rooms: Record<string, Room> = {};
 
-  public createRoom = (room: Room) => {
-    this.rooms[room.id] = room;
+  public createRoom = (user: User) => {
+    const generatedId = uuidv4();
+    this.rooms[generatedId] = new TemplateRoomModel(user, generatedId);
+    this.rooms[generatedId].users[user.id].roomId = generatedId;
+    return this.rooms[generatedId];
+  };
+
+  public updateRoom = (room: Room) => {
+    const existingRoom = this.rooms[room.id];
+    if (existingRoom) {
+      const updatedRoom = new RoomModel(room);
+      return updatedRoom;
+    }
   };
 
   public getRoomUsers = (roomId: string) => {
@@ -18,13 +31,12 @@ export class RoomService {
   };
 
   public joinRoom = (user: User) => {
-    const { id, roomId: room } = user;
-    const userRoom = this.rooms[room];
+    const { id, roomId } = user;
+    const userRoom = this.rooms[roomId];
     if (userRoom) {
       const users = userRoom.users;
       users[id] = user;
-    } else {
-      this.rooms[room] = this.generateTemplateRoom(user);
+      return userRoom;
     }
   };
 
@@ -42,8 +54,6 @@ export class RoomService {
   public updateRoomUserList = (user: User) => {
     if (this.rooms[user.roomId]) {
       this.rooms[user.roomId].users[user.id] = user;
-    } else {
-      this.rooms[user.roomId] = this.generateTemplateRoom(user);
     }
   };
 
@@ -82,18 +92,5 @@ export class RoomService {
       threeRandomWords.push(words[randomIndex]);
     }
     return threeRandomWords;
-  };
-
-  private generateTemplateRoom = (user: User) => {
-    const templateRoom: Room = {
-      id: user.roomId,
-      users: { [user.id]: user },
-      currentRound: 0,
-      wordListId: '',
-      correctGuess: '',
-      roundCount: 1,
-      drawingUser: user,
-    };
-    return templateRoom;
   };
 }

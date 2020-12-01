@@ -25,11 +25,13 @@ export interface User {
 export interface Room {
   id: string;
   users: Record<string, User>;
-  wordListId: string;
-  correctGuess: string;
   drawingUser: User;
+  adminUserId?: string;
+  correctGuess: string;
   roundCount: number;
+  drawingTime: number;
   currentRound: number;
+  hasGameStarted: boolean;
 }
 
 export interface Message {

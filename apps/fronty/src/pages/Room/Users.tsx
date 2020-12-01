@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { User } from '@teikna/interfaces';
+import { Room, User } from '@teikna/interfaces';
 import { UserMessage } from './Room.styles';
 import useSocketCanvas from '../../hooks/useSocketCanvas';
 import { SocketContext } from '../../context';
@@ -63,8 +63,8 @@ const Users = () => {
   const socket = useContext(SocketContext);
 
   useEffect(() => {
-    socket.on(MessageEvent.USERLIST, (users: User[]) => {
-      setUsers(users);
+    socket.on(RoomEvent.ROOMINFO, (room: Room) => {
+      setUsers(Object.values(room.users).map((user) => user));
     });
   }, []);
 
