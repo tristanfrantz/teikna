@@ -35,7 +35,7 @@ export interface Room {
 }
 
 export interface Message {
-  user: User;
+  user?: User;
   content: string;
   timestamp: Date;
   type?: MessageType;
