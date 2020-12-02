@@ -17,6 +17,7 @@ export class RoomService {
     const existingRoom = this.rooms[room.id];
     if (existingRoom) {
       const updatedRoom = new RoomModel(room);
+      this.rooms[room.id] = updatedRoom;
       return updatedRoom;
     }
   };
@@ -44,6 +45,7 @@ export class RoomService {
     const room = this.rooms[user.roomId];
     if (room) {
       delete room.users[user.id];
+      return room;
     }
   };
 

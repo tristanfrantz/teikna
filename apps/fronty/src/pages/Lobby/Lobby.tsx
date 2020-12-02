@@ -80,8 +80,6 @@ const Lobby = () => {
     return <div>crapper! no room!</div>;
   }
 
-  console.log(room);
-
   if (gameStarted && user) {
     return (
       <RoomContext.Provider value={room}>

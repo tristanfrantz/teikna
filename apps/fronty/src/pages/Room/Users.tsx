@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Room, User } from '@teikna/interfaces';
 import { UserMessage } from './Room.styles';
 import useSocketCanvas from '../../hooks/useSocketCanvas';
-import { SocketContext } from '../../context';
+import { RoomContext, SocketContext } from '../../context';
 import { MessageEvent, RoomEvent } from '@teikna/enums';
 
 const List = styled.div`
@@ -58,19 +58,12 @@ const Score = styled.span`
 `;
 
 const Users = () => {
-  const [users, setUsers] = useState<User[]>([]);
-
   const socket = useContext(SocketContext);
-
-  useEffect(() => {
-    socket.on(RoomEvent.ROOMINFO, (room: Room) => {
-      setUsers(Object.values(room.users).map((user) => user));
-    });
-  }, []);
+  const room = useContext(RoomContext);
 
   return (
     <UserList>
-      {users.map((user: User, index: number) => (
+      {Object.values(room.users).map((user: User, index: number) => (
         <UserListItem key={user.name}>
           <UserListItemRow>
             <Username isSelf={user.name === ''}>{user.name}</Username>

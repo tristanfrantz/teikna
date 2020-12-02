@@ -32,10 +32,6 @@ const useRoomSocket = (roomId: string) => {
         setUser({ ...user, roomId: roomInfo.id });
         setRoom(roomInfo);
       });
-
-      socket.on(MessageEvent.USERLIST, (data: User[]) => {
-        console.log('recieved user list brother');
-      });
     });
 
     // Disconnect socket when hook unmounts

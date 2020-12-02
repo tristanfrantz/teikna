@@ -35,7 +35,7 @@ export default class ChatServer {
     this.io.on(RoomEvent.CONNECT, (socket: Socket) => {
       socket.on(RoomEvent.JOINROOM, (user: User) => {
         socket.join(user.roomId);
-        this.users[user.id] = user;
+        this.users[socket.id] = user;
 
         const userJoinedMessage = messageUtils.userJoinedMessage(user);
         socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
@@ -47,6 +47,8 @@ export default class ChatServer {
       socket.on(RoomEvent.CREATEROOM, (user: User) => {
         const createdRoom = this.roomService.createRoom(user);
         socket.join(createdRoom.id);
+        this.users[socket.id] = user;
+
         socket.emit(RoomEvent.ROOMINFO, createdRoom);
       });
 
@@ -96,10 +98,10 @@ export default class ChatServer {
       socket.on(RoomEvent.DISCONNECT, () => {
         const user = this.users[socket.id];
         if (user) {
-          this.roomService.leaveRoom(user);
-          const updatedRoomInfo = this.roomService.getRoom(user.roomId);
+          const updatedRoomInfo = this.roomService.leaveRoom(user);
           const userLeaveMessage = messageUtils.userLeftMessage(user);
-          socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userLeaveMessage);
+
+          this.io.to(user.roomId).emit(MessageEvent.MESSAGE, userLeaveMessage);
           this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoomInfo);
         }
       });

@@ -12,8 +12,6 @@ import { CanvasWrapper, ContentWrapper, Header, RoomWrapper, Round, Timer } from
 import Users from './Users';
 
 const ChatRoom: React.FC<{ roomId: string }> = ({ roomId }) => {
-  // const { room } = useRoomSocket(roomId);
-
   const socket = useContext(SocketContext);
   const user = useContext(UserContext);
   const room = useContext(RoomContext);
