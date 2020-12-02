@@ -59,18 +59,20 @@ export default class ChatServer {
 
       socket.on(MessageEvent.MESSAGE, (message: Message) => {
         const { content, user } = message;
-        const room = this.roomService.getRoom(user.roomId);
-        if (room) {
-          const messageSimilarity = messageUtils.checkMessageSimilarity(room.correctGuess, content);
-          if (messageSimilarity === 1) {
-            const correctGuessMessage = messageUtils.correctGuessMessage(user);
-            socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, correctGuessMessage);
-          } else if (messageSimilarity >= 0.8) {
-            const closeGuessMessage = messageUtils.closeGuessMessage(message);
-            socket.emit(MessageEvent.CLOSEGUESS, closeGuessMessage);
-          } else {
-            const userMessage = messageUtils.userMessage(message);
-            socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, userMessage);
+        if (user) {
+          const room = this.roomService.getRoom(user.roomId);
+          if (room) {
+            const messageSimilarity = messageUtils.checkMessageSimilarity(room.correctGuess, content);
+            if (messageSimilarity === 1) {
+              const correctGuessMessage = messageUtils.correctGuessMessage(user);
+              socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, correctGuessMessage);
+            } else if (messageSimilarity >= 0.8) {
+              const closeGuessMessage = messageUtils.closeGuessMessage(message);
+              socket.emit(MessageEvent.CLOSEGUESS, closeGuessMessage);
+            } else {
+              const userMessage = messageUtils.userMessage(message);
+              socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, userMessage);
+            }
           }
         }
       });

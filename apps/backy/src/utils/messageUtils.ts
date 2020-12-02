@@ -18,29 +18,29 @@ export const userLeftMessage = (user: User) => {
 };
 
 export const userMessage = (message: Message) => {
-  const { user, content } = message;
-  const messageContent = new MessageModel(user, content, MessageType.USERMESSAGE);
+  const { content } = message;
+  const messageContent = new MessageModel(undefined, content, MessageType.USERMESSAGE);
   return messageContent;
 };
 
 /** these next 3 are server messages, user set to null since we dont want any user to send these */
 export const roundEndMessage = (correctWord: string) => {
   const content = `The word was '${correctWord}'`;
-  const messageContent = new MessageModel(null, content, MessageType.SERVERMESSAGE);
+  const messageContent = new MessageModel(undefined, content, MessageType.SERVERMESSAGE);
   return messageContent;
 };
 
 export const correctGuessMessage = (user: User) => {
-  const { name, roomId: room } = user;
+  const { name } = user;
   const content = `${name} has guessed the word!`;
-  const correctGuessMessage = new MessageModel(null, content, MessageType.SERVERMESSAGE);
+  const correctGuessMessage = new MessageModel(undefined, content, MessageType.SERVERMESSAGE);
   return correctGuessMessage;
 };
 
 export const closeGuessMessage = (message: Message) => {
   const { content } = message;
   const messageContent = `'${content}' is close!`;
-  const closeGuessMessage = new MessageModel(null, messageContent, MessageType.PRIVATEMESSAGE);
+  const closeGuessMessage = new MessageModel(undefined, messageContent, MessageType.PRIVATEMESSAGE);
   return closeGuessMessage;
 };
 
