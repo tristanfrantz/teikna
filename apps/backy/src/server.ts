@@ -65,10 +65,14 @@ export default class ChatServer {
             const messageSimilarity = messageUtils.checkMessageSimilarity(room.correctGuess, content);
             if (messageSimilarity === 1) {
               const correctGuessMessage = messageUtils.correctGuessMessage(user);
-              socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, correctGuessMessage);
+              this.io.to(room.id).emit(MessageEvent.MESSAGE, correctGuessMessage);
+
+              this.roomService.handleCorrectGuess(room.id, user.id);
+              const updatedRoom = this.roomService.getRoom(room.id);
+              this.io.to(room.id).emit(RoomEvent.ROOMINFO, updatedRoom);
             } else if (messageSimilarity >= 0.8) {
               const closeGuessMessage = messageUtils.closeGuessMessage(message);
-              socket.emit(MessageEvent.CLOSEGUESS, closeGuessMessage);
+              socket.emit(MessageEvent.MESSAGE, closeGuessMessage);
             } else {
               const userMessage = messageUtils.userMessage(message);
               socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, userMessage);
@@ -81,22 +85,6 @@ export default class ChatServer {
         // this.roomService.handleDraw(data, socket);
       });
 
-      // TODO FUNCS
-      // socket.on(ChatEvent.FILL, (data: DrawData) => {
-      //   const { user } = data;
-      //   socket.to(user.room).broadcast.emit(ChatEvent.FILL, JSON.stringify(data));
-      // });
-
-      // socket.on(ChatEvent.ERASE, (data: DrawData) => {
-      //   const drawData: DrawData = { ...data, color: 'white' };
-      //   const { user } = data;
-      //   socket.to(user.room).broadcast.emit(ChatEvent.ERASE, JSON.stringify(drawData));
-      // });
-
-      // socket.on(ChatEvent.CLEAR, (user: User) => {
-      //   socket.to(user.room).broadcast.emit(ChatEvent.CLEAR);
-      // });
-
       socket.on(RoomEvent.DISCONNECT, () => {
         const user = this.users[socket.id];
         if (user) {
@@ -108,22 +96,30 @@ export default class ChatServer {
         }
       });
 
-      /** who the hell emits this event ?  drawer ? */
-      socket.on(RoomEvent.ROUNDEND, (room: string) => {
-        // this.roomService.handleRoundEnd(room);
+      /** sent by current drawer to current drawer, generate three random words to choose from */
+      socket.on(RoomEvent.STARTDRAW, () => {
+        const threeRandomWords = this.roomService.getThreeRandomWords();
+        socket.emit(RoomEvent.WORDLIST, threeRandomWords);
       });
 
-      socket.on(RoomEvent.ROUNDSTART, (roomId: string) => {
-        const room = this.roomService.getRoom(roomId);
-        if (room) {
-          this.roomService.handleRoundStart(roomId);
-          const threeRandomWords = this.roomService.getThreeRandomWords();
-          socket.to(room.drawingUser.id).emit(MessageEvent.WORDLIST, threeRandomWords);
+      /** pick next drawing user or handle round increment, emit new room info to users */
+      socket.on(RoomEvent.STOPDRAW, () => {
+        const user = this.users[socket.id];
+        if (user) {
+          this.roomService.handleStopDraw(user.roomId);
+          const updatedRoom = this.roomService.getRoom(user.roomId);
+          this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoom);
         }
       });
 
       socket.on(RoomEvent.SELECTWORD, (roomId: string, word: string) => {
-        this.roomService.handleSelectWord(roomId, word);
+        const user = this.users[socket.id];
+        if (user) {
+          this.roomService.handleSelectWord(roomId, word, user.id);
+          const updatedRoom = this.roomService.getRoom(roomId);
+
+          this.io.to(roomId).emit(RoomEvent.ROOMINFO, updatedRoom);
+        }
       });
     });
   }

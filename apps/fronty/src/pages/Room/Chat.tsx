@@ -1,13 +1,11 @@
 import React, { KeyboardEvent, ChangeEvent } from 'react';
-import { useForm } from 'react-hook-form';
 import useSocketChat from '../../hooks/useSocketChat';
 import { Message } from '@teikna/interfaces';
 import { UserMessage, MessageInput, MessageItem, MessageList, MessageSender, MessageWrapper } from './Room.styles';
 import { MessageType } from '@teikna/enums';
 
 const Chat = () => {
-  const { messages, sendMessage, hasGuessedWord } = useSocketChat();
-  const { handleSubmit } = useForm();
+  const { messages, sendMessage } = useSocketChat();
   const [newMessage, setNewMessage] = React.useState('');
 
   const handleNewMessageChange = (event: ChangeEvent<HTMLInputElement>) => {

@@ -18,6 +18,7 @@ const useRoomSocket = (roomId: string) => {
         roomId: roomId,
         score: 0,
         hasGuessedWord: false,
+        hasDrawnInCurrentRound: false,
       };
 
       if (roomId) {

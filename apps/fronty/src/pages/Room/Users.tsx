@@ -60,11 +60,18 @@ const Score = styled.span`
 const Users = () => {
   const socket = useContext(SocketContext);
   const room = useContext(RoomContext);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    const userList = Object.values(room.users);
+    setUsers(userList.sort((a, b) => a.score - b.score));
+    console.log('sorting');
+  }, [room]);
 
   return (
     <UserList>
-      {Object.values(room.users).map((user: User, index: number) => (
-        <UserListItem key={user.name}>
+      {users.map((user: User, index: number) => (
+        <UserListItem key={index}>
           <UserListItemRow>
             <Username isSelf={user.name === ''}>{user.name}</Username>
             <Index>{`${index + 1}#`}</Index>

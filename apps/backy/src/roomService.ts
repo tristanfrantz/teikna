@@ -53,37 +53,58 @@ export class RoomService {
     return this.rooms[roomId];
   };
 
-  public updateRoomUserList = (user: User) => {
-    if (this.rooms[user.roomId]) {
-      this.rooms[user.roomId].users[user.id] = user;
+  public handleStartDraw = (roomId: string, userId: string) => {
+    const room = this.rooms[roomId];
+    if (room) {
+      room.users[userId].hasDrawnInCurrentRound = true;
+      room.isUserDrawing = true;
     }
   };
 
-  public handleRoundStart = (roomId: string) => {
+  public handleStopDraw = (roomId: string) => {
     const room = this.rooms[roomId];
     if (room) {
+      // const usersLeftToDraw = this.getUsersLeftToDrawCount(roomId);
+      // if (usersLeftToDraw === 0) {
+      //   this.handleRoundEnd(roomId);
+      // } else {
+      room.isUserDrawing = false;
       const userList = Object.values(room.users).map((user) => user);
       const currentDrawer = room.drawingUser;
-      console.log('i found room');
       if (currentDrawer) {
-        console.log('i found drawer');
         const indexOfCurrentDrawer = userList.findIndex((user) => user.id === room.drawingUser.id);
         const indexOfNewDrawer = indexOfCurrentDrawer === userList.length - 1 ? 0 : indexOfCurrentDrawer + 1;
         const newDrawer = userList[indexOfNewDrawer];
-        room.drawingUser = newDrawer;
-        userList.forEach((_, index) => {
-          userList[index].hasGuessedWord = false;
-        });
 
-        console.log('i finished everything');
+        room.drawingUser = newDrawer;
+
+        // userList.forEach((_, index) => {
+        //   userList[index].hasGuessedWord = false;
+        // });
+        // }
       }
     }
   };
 
-  public handleSelectWord = (roomId: string, word: string) => {
+  public handleSelectWord = (roomId: string, word: string, userId: string) => {
     const room = this.rooms[roomId];
     if (room) {
       room.correctGuess = word;
+      room.isUserDrawing = true;
+      room.users[userId].hasDrawnInCurrentRound = true;
+    }
+  };
+
+  public handleCorrectGuess = (roomId: string, userId: string) => {
+    const room = this.rooms[roomId];
+    const user = room.users[userId];
+
+    user.hasGuessedWord = true;
+    user.score += 100;
+
+    const usersLeftToGuess = this.getUsersLeftToGuessCount(roomId);
+    if (usersLeftToGuess === 0) {
+      room.isUserDrawing = false;
     }
   };
 
@@ -94,5 +115,33 @@ export class RoomService {
       threeRandomWords.push(words[randomIndex]);
     }
     return threeRandomWords;
+  };
+
+  private getUsersLeftToGuessCount = (roomId: string) => {
+    const room = this.rooms[roomId];
+    let count = 0;
+    Object.values(room.users).forEach((user) => {
+      if (!user.hasGuessedWord) {
+        count += 1;
+      }
+    });
+    return count;
+  };
+
+  private getUsersLeftToDrawCount = (roomId: string) => {
+    const room = this.rooms[roomId];
+    let count = 0;
+    Object.values(room.users).forEach((user) => {
+      if (!user.hasDrawnInCurrentRound) {
+        count += 1;
+      }
+    });
+    return count;
+  };
+
+  private handleRoundEnd = (roomId: string) => {
+    const room = this.rooms[roomId];
+    room.isUserDrawing = false;
+    room.currentRound += 1;
   };
 }

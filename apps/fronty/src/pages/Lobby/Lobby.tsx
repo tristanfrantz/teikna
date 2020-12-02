@@ -43,8 +43,8 @@ const Lobby = () => {
       setCopyLink(`localhost:4200/room/${room.id}`);
       /** if user isn't admin, these changes are recieved through socket */
       if (!isAdmin) {
-        setRoundCount(room.roundCount);
-        setDrawingTime(room.drawingTime);
+        setRoundCount(room.roundLimit);
+        setDrawingTime(room.drawTime);
         setGameStarted(room.hasGameStarted);
       }
     }
@@ -53,7 +53,7 @@ const Lobby = () => {
   const handleRoundLimitChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const updatedRoundcount = Number(event.target.value);
     if (room) {
-      const updatedRoom: Room = { ...room, roundCount: updatedRoundcount };
+      const updatedRoom: Room = { ...room, roundLimit: updatedRoundcount };
       socket.emit(RoomEvent.UPDATEROOM, updatedRoom);
       setRoundCount(updatedRoundcount);
     }
@@ -62,7 +62,7 @@ const Lobby = () => {
   const handleDrawTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const updatedDrawtime = Number(event.target.value);
     if (room) {
-      const updatedRoom: Room = { ...room, drawingTime: updatedDrawtime };
+      const updatedRoom: Room = { ...room, drawTime: updatedDrawtime };
       socket.emit(RoomEvent.UPDATEROOM, updatedRoom);
       setDrawingTime(updatedDrawtime);
     }
@@ -85,7 +85,7 @@ const Lobby = () => {
       <RoomContext.Provider value={room}>
         <UserContext.Provider value={user}>
           <SocketContext.Provider value={socket}>
-            <ChatRoom roomId={roomId} />
+            <ChatRoom />
           </SocketContext.Provider>
         </UserContext.Provider>
       </RoomContext.Provider>

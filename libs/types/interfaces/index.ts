@@ -19,6 +19,7 @@ export interface User {
   roomId: string;
   score: number;
   hasGuessedWord: boolean;
+  hasDrawnInCurrentRound: boolean;
   img?: string;
 }
 
@@ -26,12 +27,13 @@ export interface Room {
   id: string;
   users: Record<string, User>;
   drawingUser: User;
-  adminUserId?: string;
+  adminUserId: string;
   correctGuess: string;
-  roundCount: number;
-  drawingTime: number;
+  roundLimit: number;
   currentRound: number;
+  drawTime: number;
   hasGameStarted: boolean;
+  isUserDrawing: boolean;
 }
 
 export interface Message {

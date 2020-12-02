@@ -5,11 +5,12 @@ abstract class AbstractRoomModel implements Room {
   users!: Record<string, User>;
   correctGuess!: string;
   drawingUser!: User;
-  roundCount!: number;
-  drawingTime!: number;
+  roundLimit!: number;
+  drawTime!: number;
   currentRound!: number;
-  adminUserId?: string;
+  adminUserId!: string;
   hasGameStarted!: boolean;
+  isUserDrawing!: boolean;
 }
 
 export class RoomModel extends AbstractRoomModel {
@@ -19,11 +20,12 @@ export class RoomModel extends AbstractRoomModel {
     this.users = room.users;
     this.correctGuess = room.correctGuess;
     this.drawingUser = room.drawingUser;
-    this.roundCount = room.roundCount;
-    this.drawingTime = room.drawingTime;
+    this.roundLimit = room.roundLimit;
+    this.drawTime = room.drawTime;
     this.currentRound = room.currentRound;
     this.adminUserId = room.adminUserId;
     this.hasGameStarted = room.hasGameStarted;
+    this.isUserDrawing = room.isUserDrawing;
   }
 }
 
@@ -34,10 +36,11 @@ export class TemplateRoomModel extends AbstractRoomModel {
     this.users = { [user.id]: user };
     this.correctGuess = '';
     this.drawingUser = user;
-    this.roundCount = 3;
-    this.drawingTime = 50;
+    this.roundLimit = 3;
+    this.drawTime = 50;
     this.currentRound = 1;
     this.adminUserId = user.id;
     this.hasGameStarted = false;
+    this.isUserDrawing = false;
   }
 }
