@@ -1,7 +1,7 @@
 import { Room, User } from '@teikna/interfaces';
 import { words } from './words';
 import { v4 as uuidv4 } from 'uuid';
-import { RoomModel, TemplateRoomModel } from '@teikna/models';
+import { RoomModel, TemplateRoomModel, TurnModel } from '@teikna/models';
 
 export class RoomService {
   private rooms: Record<string, Room> = {};
@@ -82,6 +82,7 @@ export class RoomService {
     if (room) {
       room.correctGuess = word;
       room.isUserDrawing = true;
+      room.turn = new TurnModel();
       room.users[userId].hasDrawnInCurrentRound = true;
     }
   };

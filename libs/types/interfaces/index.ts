@@ -34,6 +34,11 @@ export interface Room {
   drawTime: number;
   hasGameStarted: boolean;
   isUserDrawing: boolean;
+  turn?: Turn;
+}
+
+export interface Turn {
+  startDateTime: Date;
 }
 
 export interface Message {

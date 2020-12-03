@@ -9,6 +9,7 @@ import cors from 'cors';
 
 import * as messageUtils from './utils';
 import { correctGuessMessage } from './utils';
+import { TurnModel } from '@teikna/models';
 
 export default class ChatServer {
   private port = 8080;
@@ -102,11 +103,8 @@ export default class ChatServer {
       });
 
       /** sent by current drawer to current drawer, generate three random words to choose from */
-      socket.on(RoomEvent.TURNSTART, () => {
+      socket.on(RoomEvent.STARTGAME, () => {
         const threeRandomWords = this.roomService.getThreeRandomWords();
-                
-
-
         socket.emit(RoomEvent.WORDLIST, threeRandomWords);
       });
 

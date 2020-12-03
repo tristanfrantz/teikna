@@ -27,6 +27,8 @@
   },
   "private": true,
   "dependencies": {
+    "@types/date-fns": "^2.6.0",
+    "date-fns": "^2.16.1",
     "document-register-element": "1.13.1",
     "express": "4.17.1",
     "lodash": "^4.17.20",

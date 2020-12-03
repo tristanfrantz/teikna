@@ -10,7 +10,7 @@ export enum RoomEvent {
   ROUNDSTART = 'roundstart',
   WORDLIST = 'wordlist',
   ROOMINFO = 'roominfo',
-  TURNSTART = 'turnstart',
+  STARTGAME = 'startgame',
   TURNEND = 'turnend',
 }
 

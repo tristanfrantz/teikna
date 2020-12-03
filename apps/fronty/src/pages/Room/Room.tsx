@@ -7,6 +7,8 @@ import Messages from './Chat';
 import DrawingBoard from './DrawingBoard';
 import { CanvasWrapper, ContentWrapper, Header, RoomWrapper, Round, Timer } from './Room.styles';
 import Users from './Users';
+import { differenceInSeconds } from 'date-fns';
+
 
 const ChatRoom = () => {
   const socket = useContext(SocketContext);
@@ -17,17 +19,19 @@ const ChatRoom = () => {
   const [threeWords, setThreeWords] = useState<string[]>([]);
   const [roundTimer, setRoundtimer] = useState(room.drawTime);
 
+
+
   useEffect(() => {
     console.log(room.drawingUser.name, user.name);
     setIsDrawing(room.drawingUser.id === user.id);
     setThreeWords([]);
   }, [room.drawingUser.id]);
 
-  /** when users enter room, start game after 3 secs or sumthin */
+  // /** when users enter room, start game after 3 secs or sumthin */
   useEffect(() => {
     if (isDrawing) {
       setTimeout(() => {
-        socket.emit(RoomEvent.TURNSTART);
+        socket.emit(RoomEvent.STARTGAME);
         setRoundtimer(room.drawTime);
       }, 3000);
     }
@@ -48,14 +52,17 @@ const ChatRoom = () => {
       socket.emit(RoomEvent.TURNEND);
     }
 
-    const timer = setTimeout(() => {
-      if (room.isUserDrawing && roundTimer > 0) {
-        setRoundtimer((roundTimer) => roundTimer - 1);
+    const interval = setInterval(() => {
+      if (room.turn) {
+        const diff = differenceInSeconds(new Date(), new Date(room.turn?.startDateTime));
+        const newRounderTimer = Math.min(Math.max(roundTimer - diff, 0), room.drawTime);
+        setRoundtimer(newRounderTimer);
       }
-    }, 1000);
+    }, 900);
 
-    return () => clearTimeout(timer);
-  }, [roundTimer, room]);
+    return () => clearInterval(interval);
+  }, [room.turn?.startDateTime]);
+
 
   const handleWordSelect = (word: string) => {
     socket.emit(RoomEvent.SELECTWORD, room.id, word);
