@@ -41,12 +41,14 @@ export default class ChatServer {
         const userJoinedMessage = messageUtils.userJoinedMessage(user);
         socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
 
-        const room = this.roomService.joinRoom(user);
+        this.roomService.joinRoom(user);
+        const room = this.roomService.getRoom(user.roomId);
         this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, room);
       });
 
       socket.on(RoomEvent.CREATEROOM, (user: User) => {
-        const createdRoom = this.roomService.createRoom(user);
+        this.roomService.createRoom(user);
+        const createdRoom = this.roomService.getRoom(user.roomId);
         socket.join(createdRoom.id);
         this.users[socket.id] = user;
 
@@ -54,7 +56,8 @@ export default class ChatServer {
       });
 
       socket.on(RoomEvent.UPDATEROOM, (room: Room) => {
-        const updatedRoom = this.roomService.updateRoom(room);
+        this.roomService.updateRoom(room);
+        const updatedRoom = this.roomService.getRoom(room.id);
         this.io.to(room.id).emit(RoomEvent.ROOMINFO, updatedRoom);
       });
 
@@ -89,17 +92,21 @@ export default class ChatServer {
       socket.on(RoomEvent.DISCONNECT, () => {
         const user = this.users[socket.id];
         if (user) {
-          const updatedRoomInfo = this.roomService.leaveRoom(user);
+          this.roomService.leaveRoom(user);
+          const updatedRoom = this.roomService.getRoom(user.roomId);
           const userLeaveMessage = messageUtils.userLeftMessage(user);
 
           this.io.to(user.roomId).emit(MessageEvent.MESSAGE, userLeaveMessage);
-          this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoomInfo);
+          this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoom);
         }
       });
 
       /** sent by current drawer to current drawer, generate three random words to choose from */
       socket.on(RoomEvent.TURNSTART, () => {
         const threeRandomWords = this.roomService.getThreeRandomWords();
+                
+
+
         socket.emit(RoomEvent.WORDLIST, threeRandomWords);
       });
 

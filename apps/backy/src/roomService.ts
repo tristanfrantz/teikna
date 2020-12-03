@@ -10,7 +10,6 @@ export class RoomService {
     const generatedId = uuidv4();
     this.rooms[generatedId] = new TemplateRoomModel(user, generatedId);
     this.rooms[generatedId].users[user.id].roomId = generatedId;
-    return this.rooms[generatedId];
   };
 
   public updateRoom = (room: Room) => {
@@ -18,7 +17,6 @@ export class RoomService {
     if (existingRoom) {
       const updatedRoom = new RoomModel(room);
       this.rooms[room.id] = updatedRoom;
-      return updatedRoom;
     }
   };
 
@@ -37,7 +35,6 @@ export class RoomService {
     if (userRoom) {
       const users = userRoom.users;
       users[id] = user;
-      return userRoom;
     }
   };
 
@@ -45,7 +42,6 @@ export class RoomService {
     const room = this.rooms[user.roomId];
     if (room) {
       delete room.users[user.id];
-      return room;
     }
   };
 
