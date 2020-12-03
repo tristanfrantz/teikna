@@ -18,40 +18,15 @@ const ChatRoom = () => {
   const [isDrawing, setIsDrawing] = useState(room.drawingUser.id === user.id);
   const [threeWords, setThreeWords] = useState<string[]>([]);
   const [roundTimer, setRoundtimer] = useState(room.drawTime);
-
-
-
+  
   useEffect(() => {
-    console.log(room.drawingUser.name, user.name);
-    setIsDrawing(room.drawingUser.id === user.id);
-    setThreeWords([]);
-  }, [room.drawingUser.id]);
-
-  // /** when users enter room, start game after 3 secs or sumthin */
-  useEffect(() => {
-    if (isDrawing) {
-      setTimeout(() => {
-        socket.emit(RoomEvent.STARTGAME);
-        setRoundtimer(room.drawTime);
-      }, 3000);
-    }
-  }, [isDrawing]);
-
-  /** if user is drawing, listen for three words to select from */
-  useEffect(() => {
-    if (isDrawing) {
-      socket.on(RoomEvent.WORDLIST, (words: string[]) => {
-        setThreeWords(words);
-      });
-    }
-  }, [isDrawing, room]);
+    socket.on(RoomEvent.WORDLIST, (wordSelection: string[]) => {
+      setThreeWords(wordSelection);
+    })
+  }, [])
 
   /** handle timer */
   useEffect(() => {
-    if (roundTimer <= 0 && user.id === room.drawingUser.id && room.isUserDrawing) {
-      socket.emit(RoomEvent.TURNEND);
-    }
-
     const interval = setInterval(() => {
       if (room.turn) {
         const diff = differenceInSeconds(new Date(), new Date(room.turn?.startDateTime));
@@ -62,7 +37,7 @@ const ChatRoom = () => {
 
     return () => clearInterval(interval);
   }, [room.turn?.startDateTime]);
-
+  
 
   const handleWordSelect = (word: string) => {
     socket.emit(RoomEvent.SELECTWORD, room.id, word);

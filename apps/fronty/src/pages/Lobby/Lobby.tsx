@@ -70,8 +70,7 @@ const Lobby = () => {
 
   const handleStartGame = () => {
     if (room) {
-      const updatedRoom: Room = { ...room, hasGameStarted: true };
-      socket.emit(RoomEvent.UPDATEROOM, updatedRoom);
+      socket.emit(RoomEvent.STARTGAME);
       setGameStarted(true);
     }
   };
