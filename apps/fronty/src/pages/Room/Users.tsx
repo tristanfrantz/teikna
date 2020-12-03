@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Room, User } from '@teikna/interfaces';
 import { UserMessage } from './Room.styles';
 import useSocketCanvas from '../../hooks/useSocketCanvas';
-import { RoomContext, SocketContext } from '../../context';
+import { RoomContext, SocketContext, UserContext } from '../../context';
 import { MessageEvent, RoomEvent } from '@teikna/enums';
 
 const List = styled.div`
@@ -17,13 +17,13 @@ const UserList = styled(List)`
   width: 200px;
 `;
 
-const UserListItem = styled.div`
+const UserListItem = styled.div<{ hasGuessedWord: boolean }>`
   display: flex;
   width: 100%;
   flex-direction: column;
   padding: ${(p) => p.theme.spacing}px;
   border-radius: 4px;
-  background-color: white;
+  background-color: ${(p) => (p.hasGuessedWord ? 'green' : 'white')};
   margin-bottom: 4px;
 `;
 
@@ -60,25 +60,26 @@ const Score = styled.span`
 const Users = () => {
   const socket = useContext(SocketContext);
   const room = useContext(RoomContext);
+  const user = useContext(UserContext);
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const userList = Object.values(room.users);
-    setUsers(userList.sort((a, b) => a.score - b.score));
+    const sortedUserList = Object.values(room.users).sort((a, b) => b.score - a.score);
+    setUsers(sortedUserList);
     console.log('sorting');
   }, [room]);
 
   return (
     <UserList>
-      {users.map((user: User, index: number) => (
-        <UserListItem key={index}>
+      {users.map((u: User, index: number) => (
+        <UserListItem key={index} hasGuessedWord={u.hasGuessedWord}>
           <UserListItemRow>
-            <Username isSelf={user.name === ''}>{user.name}</Username>
+            <Username isSelf={u.id === user.id}>{u.name}</Username>
             <Index>{`${index + 1}#`}</Index>
           </UserListItemRow>
           <UserListItemRow>
             {/* <UserImage src={user.img} /> */}
-            <Score>{user.score}</Score>
+            <Score>{u.score}</Score>
           </UserListItemRow>
         </UserListItem>
       ))}

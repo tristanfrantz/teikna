@@ -18,14 +18,17 @@ const ChatRoom = () => {
   const [roundTimer, setRoundtimer] = useState(room.drawTime);
 
   useEffect(() => {
+    console.log(room.drawingUser.name, user.name);
     setIsDrawing(room.drawingUser.id === user.id);
-  }, [room]);
+    setThreeWords([]);
+  }, [room.drawingUser.id]);
 
   /** when users enter room, start game after 3 secs or sumthin */
   useEffect(() => {
     if (isDrawing) {
       setTimeout(() => {
-        socket.emit(RoomEvent.STARTDRAW);
+        socket.emit(RoomEvent.TURNSTART);
+        setRoundtimer(room.drawTime);
       }, 3000);
     }
   }, [isDrawing]);
@@ -41,8 +44,8 @@ const ChatRoom = () => {
 
   /** handle timer */
   useEffect(() => {
-    if (roundTimer <= 0 && user.id === room.drawingUser.id) {
-      socket.emit(RoomEvent.STOPDRAW);
+    if (roundTimer <= 0 && user.id === room.drawingUser.id && room.isUserDrawing) {
+      socket.emit(RoomEvent.TURNEND);
     }
 
     const timer = setTimeout(() => {

@@ -24,7 +24,7 @@ export const userMessage = (message: Message) => {
 };
 
 /** these next 3 are server messages, user set to null since we dont want any user to send these */
-export const roundEndMessage = (correctWord: string) => {
+export const correctWordMessage = (correctWord: string) => {
   const content = `The word was '${correctWord}'`;
   const messageContent = new MessageModel(undefined, content, MessageType.SERVERMESSAGE);
   return messageContent;

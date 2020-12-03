@@ -10,8 +10,8 @@ export enum RoomEvent {
   ROUNDSTART = 'roundstart',
   WORDLIST = 'wordlist',
   ROOMINFO = 'roominfo',
-  STARTDRAW = 'startdraw',
-  STOPDRAW = 'stopdraw',
+  TURNSTART = 'turnstart',
+  TURNEND = 'turnend',
 }
 
 export enum MessageEvent {

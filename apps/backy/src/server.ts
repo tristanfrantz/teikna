@@ -8,6 +8,7 @@ import { RoomService } from './roomService';
 import cors from 'cors';
 
 import * as messageUtils from './utils';
+import { correctGuessMessage } from './utils';
 
 export default class ChatServer {
   private port = 8080;
@@ -97,17 +98,20 @@ export default class ChatServer {
       });
 
       /** sent by current drawer to current drawer, generate three random words to choose from */
-      socket.on(RoomEvent.STARTDRAW, () => {
+      socket.on(RoomEvent.TURNSTART, () => {
         const threeRandomWords = this.roomService.getThreeRandomWords();
         socket.emit(RoomEvent.WORDLIST, threeRandomWords);
       });
 
       /** pick next drawing user or handle round increment, emit new room info to users */
-      socket.on(RoomEvent.STOPDRAW, () => {
+      socket.on(RoomEvent.TURNEND, () => {
         const user = this.users[socket.id];
         if (user) {
-          this.roomService.handleStopDraw(user.roomId);
+          this.roomService.handleTurnEnd(user.roomId);
           const updatedRoom = this.roomService.getRoom(user.roomId);
+          const correctWordMessage = messageUtils.correctWordMessage(updatedRoom.correctGuess);
+
+          this.io.to(user.roomId).emit(MessageEvent.MESSAGE, correctWordMessage);
           this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoom);
         }
       });
