@@ -1,15 +1,16 @@
 import { createServer, Server as HttpServer } from 'http';
 import express from 'express';
 import { Server as SocketServer, Socket } from 'socket.io';
-import { RoomEvent, MessageEvent } from '@teikna/enums';
+import { RoomEvent, MessageEvent, CanvasEvent } from '@teikna/enums';
 import { DrawData, Message, Room, User } from '@teikna/interfaces';
 
 import { RoomService } from './roomService';
 import cors from 'cors';
 
 import * as messageUtils from './utils';
-import { correctGuessMessage } from './utils';
-import { TurnModel } from '@teikna/models';
+import { differenceInSeconds } from 'date-fns';
+
+import * as cron from 'node-cron';
 
 export default class ChatServer {
   private port = 8080;
@@ -32,6 +33,11 @@ export default class ChatServer {
   private listen(): void {
     this.server.listen(this.port, () => {
       console.log('Running server on port %s', this.port);
+
+      /** every second */
+      cron.schedule('* * * * * *', () => {
+        this.checkForTurnEndInRooms();
+      });
     });
 
     this.io.on(RoomEvent.CONNECT, (socket: Socket) => {
@@ -43,8 +49,7 @@ export default class ChatServer {
         socket.to(user.roomId).broadcast.emit(MessageEvent.MESSAGE, userJoinedMessage);
 
         this.roomService.joinRoom(user);
-        const room = this.roomService.getRoom(user.roomId);
-        this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, room);
+        this.emitRoomInfo(user.roomId);
       });
 
       socket.on(RoomEvent.CREATEROOM, (user: User) => {
@@ -58,8 +63,7 @@ export default class ChatServer {
 
       socket.on(RoomEvent.UPDATEROOM, (room: Room) => {
         this.roomService.updateRoom(room);
-        const updatedRoom = this.roomService.getRoom(room.id);
-        this.io.to(room.id).emit(RoomEvent.ROOMINFO, updatedRoom);
+        this.emitRoomInfo(room.id);
       });
 
       socket.on(MessageEvent.MESSAGE, (message: Message) => {
@@ -73,8 +77,7 @@ export default class ChatServer {
               this.io.to(room.id).emit(MessageEvent.MESSAGE, correctGuessMessage);
 
               this.roomService.handleCorrectGuess(room.id, user.id);
-              const updatedRoom = this.roomService.getRoom(room.id);
-              this.io.to(room.id).emit(RoomEvent.ROOMINFO, updatedRoom);
+              this.emitRoomInfo(room.id);
             } else if (messageSimilarity >= 0.8) {
               const closeGuessMessage = messageUtils.closeGuessMessage(message);
               socket.emit(MessageEvent.MESSAGE, closeGuessMessage);
@@ -86,7 +89,7 @@ export default class ChatServer {
         }
       });
 
-      socket.on(MessageEvent.DRAW, (data: DrawData) => {
+      socket.on(CanvasEvent.DRAW, (data: DrawData) => {
         // this.roomService.handleDraw(data, socket);
       });
 
@@ -94,30 +97,20 @@ export default class ChatServer {
         const user = this.users[socket.id];
         if (user) {
           this.roomService.leaveRoom(user);
-          const updatedRoom = this.roomService.getRoom(user.roomId);
           const userLeaveMessage = messageUtils.userLeftMessage(user);
 
           this.io.to(user.roomId).emit(MessageEvent.MESSAGE, userLeaveMessage);
-          this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoom);
+          this.emitRoomInfo(user.roomId);
         }
       });
 
-      /** sent by current drawer to current drawer, generate three random words to choose from */
+      /** sent by lobby owner when he presses start game, emits three words to drawer */
       socket.on(RoomEvent.STARTGAME, () => {
-        const threeRandomWords = this.roomService.getThreeRandomWords();
-        socket.emit(RoomEvent.WORDLIST, threeRandomWords);
-      });
-
-      /** pick next drawing user or handle round increment, emit new room info to users */
-      socket.on(RoomEvent.TURNEND, () => {
         const user = this.users[socket.id];
         if (user) {
-          this.roomService.handleTurnEnd(user.roomId);
-          const updatedRoom = this.roomService.getRoom(user.roomId);
-          const correctWordMessage = messageUtils.correctWordMessage(updatedRoom.correctGuess);
-
-          this.io.to(user.roomId).emit(MessageEvent.MESSAGE, correctWordMessage);
-          this.io.to(user.roomId).emit(RoomEvent.ROOMINFO, updatedRoom);
+          this.roomService.handleStartGame(user.roomId);
+          this.emitRoomInfo(user.roomId);
+          this.emitThreeRandomWords(user.roomId);
         }
       });
 
@@ -125,11 +118,52 @@ export default class ChatServer {
         const user = this.users[socket.id];
         if (user) {
           this.roomService.handleSelectWord(roomId, word, user.id);
-          const updatedRoom = this.roomService.getRoom(roomId);
-
-          this.io.to(roomId).emit(RoomEvent.ROOMINFO, updatedRoom);
+          this.emitRoomInfo(roomId);
         }
       });
     });
   }
+
+  private checkForTurnEndInRooms = () => {
+    const rooms = this.roomService.getRoomList();
+    rooms.forEach((room) => {
+      if (room.isUserDrawing) {
+        const usersLeftToGuess = this.roomService.getUsersLeftToGuessCount(room.id);
+        const dateNow = new Date();
+        const isDrawingTimeExpired = differenceInSeconds(dateNow, new Date(room.turn.startDateTime)) === room.drawTime;
+        if (usersLeftToGuess === 0 || isDrawingTimeExpired) {
+          console.log('turn should end, updating room and emitting now');
+          this.roomService.handleTurnEnd(room.id);
+
+          this.emitTurnEnd(room.id);
+          this.emitRoomInfo(room.id);
+          this.emitThreeRandomWords(room.id);
+        }
+      }
+    });
+  };
+
+  private emitThreeRandomWords = (roomId: string) => {
+    const room = this.roomService.getRoom(roomId);
+    if (room) {
+      const threeRandomWords = this.roomService.getThreeRandomWords();
+      this.io.to(room.drawingUser.id).emit(RoomEvent.WORDLIST, threeRandomWords);
+    }
+  };
+
+  private emitTurnEnd = (roomId: string) => {
+    const room = this.roomService.getRoom(roomId);
+    if (room) {
+      const turnEndMessage = messageUtils.turnEndMessage(room.correctGuess);
+      this.io.to(room.id).emit(MessageEvent.MESSAGE, turnEndMessage);
+      this.io.to(room.id).emit(RoomEvent.TURNEND);
+    }
+  };
+
+  private emitRoomInfo = (roomId: string) => {
+    const room = this.roomService.getRoom(roomId);
+    if (room) {
+      this.io.to(room.id).emit(RoomEvent.ROOMINFO, room);
+    }
+  };
 }

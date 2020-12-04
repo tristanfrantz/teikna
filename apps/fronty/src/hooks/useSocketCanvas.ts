@@ -2,7 +2,7 @@ import { Coordinates, DrawData } from '@teikna/interfaces';
 import { useRef, useState, useEffect, useContext } from 'react';
 import { throttle } from 'lodash';
 import { SocketContext, UserContext } from '../context';
-import { MessageEvent } from '@teikna/enums';
+import { CanvasEvent, MessageEvent } from '@teikna/enums';
 
 const useSocketCanvas = () => {
   const socket = useContext(SocketContext);
@@ -63,7 +63,7 @@ const useSocketCanvas = () => {
         const data = { start, end, color: '#000', lineWidth: 2, room: user.roomId };
 
         drawLine(data);
-        socket.emit(MessageEvent.DRAW, data);
+        socket.emit(CanvasEvent.DRAW, data);
       }
     };
 
@@ -85,7 +85,7 @@ const useSocketCanvas = () => {
     }
 
     // Event listeners
-    socket.on(MessageEvent.DRAW, (data: DrawData) => {
+    socket.on(CanvasEvent.DRAW, (data: DrawData) => {
       drawLine(data);
     });
 

@@ -16,6 +16,9 @@ export enum RoomEvent {
 
 export enum MessageEvent {
   MESSAGE = 'message',
+}
+
+export enum CanvasEvent {
   DRAW = 'draw',
   CLEAR = 'clear',
   ERASE = 'erase',

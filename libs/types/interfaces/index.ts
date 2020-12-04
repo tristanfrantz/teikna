@@ -34,11 +34,19 @@ export interface Room {
   drawTime: number;
   hasGameStarted: boolean;
   isUserDrawing: boolean;
-  turn?: Turn;
+  turn: Turn;
 }
 
 export interface Turn {
   startDateTime: Date;
+  usersGuessedThisTurn: TurnUser[];
+}
+
+export interface TurnUser {
+  id: string;
+  name: string;
+  dateTimeOfGuess: Date;
+  score: number;
 }
 
 export interface Message {

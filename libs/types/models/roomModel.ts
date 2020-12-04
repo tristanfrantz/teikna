@@ -1,4 +1,5 @@
-import { Room, User } from '@teikna/interfaces';
+import { Room, Turn, User } from '@teikna/interfaces';
+import { TemplateTurnModel } from './turnModel';
 
 abstract class AbstractRoomModel implements Room {
   id!: string;
@@ -11,6 +12,7 @@ abstract class AbstractRoomModel implements Room {
   adminUserId!: string;
   hasGameStarted!: boolean;
   isUserDrawing!: boolean;
+  turn!: Turn;
 }
 
 export class RoomModel extends AbstractRoomModel {
@@ -26,6 +28,7 @@ export class RoomModel extends AbstractRoomModel {
     this.adminUserId = room.adminUserId;
     this.hasGameStarted = room.hasGameStarted;
     this.isUserDrawing = room.isUserDrawing;
+    this.turn = room.turn;
   }
 }
 
@@ -42,5 +45,6 @@ export class TemplateRoomModel extends AbstractRoomModel {
     this.adminUserId = user.id;
     this.hasGameStarted = false;
     this.isUserDrawing = false;
+    this.turn = new TemplateTurnModel();
   }
 }

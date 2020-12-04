@@ -18,17 +18,14 @@ export const userLeftMessage = (user: User) => {
 };
 
 export const userMessage = (message: Message) => {
-  const { content } = message;
-  const messageContent = new MessageModel(undefined, content, MessageType.USERMESSAGE);
-  return messageContent;
+  const { content, user } = message;
+  if (user) {
+    const messageContent = new MessageModel(user, content, MessageType.USERMESSAGE);
+    return messageContent;
+  }
 };
 
-/** these next 3 are server messages, user set to null since we dont want any user to send these */
-export const correctWordMessage = (correctWord: string) => {
-  const content = `The word was '${correctWord}'`;
-  const messageContent = new MessageModel(undefined, content, MessageType.SERVERMESSAGE);
-  return messageContent;
-};
+/** these are server messages, user set to null since we dont want any user to send these */
 
 export const correctGuessMessage = (user: User) => {
   const { name } = user;
@@ -44,6 +41,12 @@ export const closeGuessMessage = (message: Message) => {
   return closeGuessMessage;
 };
 
+export const turnEndMessage = (correctWord: string) => {
+  const content = `The word was '${correctWord}'`;
+  const messageContent = new MessageModel(undefined, content, MessageType.SERVERMESSAGE);
+  return messageContent;
+};
+
 export const checkMessageSimilarity = (correctMessage: string, message: string) => {
-  return compareTwoStrings(correctMessage, message);
+  return compareTwoStrings(correctMessage, message.toLowerCase());
 };

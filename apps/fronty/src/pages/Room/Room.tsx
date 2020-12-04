@@ -9,7 +9,6 @@ import { CanvasWrapper, ContentWrapper, Header, RoomWrapper, Round, Timer } from
 import Users from './Users';
 import { differenceInSeconds } from 'date-fns';
 
-
 const ChatRoom = () => {
   const socket = useContext(SocketContext);
   const user = useContext(UserContext);
@@ -18,18 +17,22 @@ const ChatRoom = () => {
   const [isDrawing, setIsDrawing] = useState(room.drawingUser.id === user.id);
   const [threeWords, setThreeWords] = useState<string[]>([]);
   const [roundTimer, setRoundtimer] = useState(room.drawTime);
-  
+
   useEffect(() => {
+    socket.on(RoomEvent.TURNEND, () => {
+      setRoundtimer(room.drawTime);
+      setThreeWords([]);
+    });
     socket.on(RoomEvent.WORDLIST, (wordSelection: string[]) => {
       setThreeWords(wordSelection);
-    })
-  }, [])
+    });
+  }, []);
 
   /** handle timer */
   useEffect(() => {
     const interval = setInterval(() => {
-      if (room.turn) {
-        const diff = differenceInSeconds(new Date(), new Date(room.turn?.startDateTime));
+      if (room.isUserDrawing) {
+        const diff = differenceInSeconds(new Date(), new Date(room.turn.startDateTime));
         const newRounderTimer = Math.min(Math.max(roundTimer - diff, 0), room.drawTime);
         setRoundtimer(newRounderTimer);
       }
@@ -37,7 +40,6 @@ const ChatRoom = () => {
 
     return () => clearInterval(interval);
   }, [room.turn?.startDateTime]);
-  
 
   const handleWordSelect = (word: string) => {
     socket.emit(RoomEvent.SELECTWORD, room.id, word);

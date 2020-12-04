@@ -1,7 +1,8 @@
-import { Room, User } from '@teikna/interfaces';
+import { Room, TurnUser, User } from '@teikna/interfaces';
 import { words } from './words';
 import { v4 as uuidv4 } from 'uuid';
-import { RoomModel, TemplateRoomModel, TurnModel } from '@teikna/models';
+import { RoomModel, TemplateRoomModel, TemplateTurnModel, TurnUserModel } from '@teikna/models';
+import { differenceInSeconds } from 'date-fns';
 
 export class RoomService {
   private rooms: Record<string, Room> = {};
@@ -29,6 +30,10 @@ export class RoomService {
     return [];
   };
 
+  public getRoomList = () => {
+    return Object.values(this.rooms);
+  };
+
   public joinRoom = (user: User) => {
     const { id, roomId } = user;
     const userRoom = this.rooms[roomId];
@@ -49,11 +54,10 @@ export class RoomService {
     return this.rooms[roomId];
   };
 
-  public handleTurnStart = (roomId: string, userId: string) => {
+  public handleStartGame = (roomId: string) => {
     const room = this.rooms[roomId];
     if (room) {
-      room.users[userId].hasDrawnInCurrentRound = true;
-      room.isUserDrawing = true;
+      room.hasGameStarted = true;
     }
   };
 
@@ -69,6 +73,10 @@ export class RoomService {
 
         room.drawingUser = newDrawer;
         room.isUserDrawing = false;
+        const shouldIncrementRound = this.hasEveryUserDrawn(room.id);
+        if (shouldIncrementRound) {
+          room.currentRound += 1;
+        }
 
         userList.forEach((_, index) => {
           userList[index].hasGuessedWord = false;
@@ -82,7 +90,7 @@ export class RoomService {
     if (room) {
       room.correctGuess = word;
       room.isUserDrawing = true;
-      room.turn = new TurnModel();
+      room.turn = new TemplateTurnModel();
       room.users[userId].hasDrawnInCurrentRound = true;
     }
   };
@@ -92,12 +100,12 @@ export class RoomService {
     const user = room.users[userId];
 
     user.hasGuessedWord = true;
-    user.score += 100;
+    const dateNow = new Date();
+    const secondsLeftToGuess = room.drawTime - differenceInSeconds(dateNow, new Date(room.turn.startDateTime));
+    const calculatedGuessScore = 10 * secondsLeftToGuess;
 
-    const usersLeftToGuess = this.getUsersLeftToGuessCount(roomId);
-    if (usersLeftToGuess === 0) {
-      this.handleTurnEnd(roomId);
-    }
+    const turnUser: TurnUser = new TurnUserModel(user, calculatedGuessScore);
+    room.turn.usersGuessedThisTurn.push(turnUser);
   };
 
   public getThreeRandomWords = () => {
@@ -109,7 +117,7 @@ export class RoomService {
     return threeRandomWords;
   };
 
-  private getUsersLeftToGuessCount = (roomId: string) => {
+  public getUsersLeftToGuessCount = (roomId: string) => {
     const room = this.rooms[roomId];
     let count = 0;
     Object.values(room.users).forEach((user) => {
@@ -120,20 +128,14 @@ export class RoomService {
     return count;
   };
 
-  private getUsersLeftToDrawCount = (roomId: string) => {
+  private hasEveryUserDrawn = (roomId: string) => {
     const room = this.rooms[roomId];
-    let count = 0;
-    Object.values(room.users).forEach((user) => {
+    const userList = Object.values(room.users);
+    userList.forEach((user) => {
       if (!user.hasDrawnInCurrentRound) {
-        count += 1;
+        return false;
       }
     });
-    return count;
-  };
-
-  private handleRoundEnd = (roomId: string) => {
-    const room = this.rooms[roomId];
-    room.isUserDrawing = false;
-    room.currentRound += 1;
+    return true;
   };
 }
