@@ -5,7 +5,7 @@ import Container from '../../components/Container';
 import { RoomContext, SocketContext, UserContext } from '../../context';
 import Messages from './Chat';
 import DrawingBoard from './DrawingBoard';
-import { CanvasWrapper, ContentWrapper, Header, RoomWrapper, Round, Timer } from './Room.styles';
+import { CanvasWrapper, ContentWrapper, Header, RoomWrapper, Round, TurnEndContainer, Timer } from './Room.styles';
 import Users from './Users';
 import { differenceInSeconds } from 'date-fns';
 
@@ -17,13 +17,22 @@ const ChatRoom = () => {
   const [isDrawing, setIsDrawing] = useState(room.drawingUser.id === user.id);
   const [threeWords, setThreeWords] = useState<string[]>([]);
   const [roundTimer, setRoundtimer] = useState(room.drawTime);
+  const [displayTurnEnd, setDisplayTurnEnd] = useState(false);
 
   useEffect(() => {
     socket.on(RoomEvent.TURNEND, () => {
+      console.log(room);
       setRoundtimer(room.drawTime);
       setThreeWords([]);
+
+      /** this bad boy is just a tester */
+      setDisplayTurnEnd(true);
+      setTimeout(() => {
+        setDisplayTurnEnd(false);
+      }, 15000);
     });
     socket.on(RoomEvent.WORDLIST, (wordSelection: string[]) => {
+      console.log(wordSelection);
       setThreeWords(wordSelection);
     });
   }, []);
@@ -48,7 +57,19 @@ const ChatRoom = () => {
   return (
     <Container>
       <RoomWrapper>
-        <h1>{room.drawingUser.name} is drawing</h1>
+        <h1>
+          {room.drawingUser.name} {`${room.isUserDrawing ? 'is drawing' : 'is choosing a word'}`}
+        </h1>
+        {displayTurnEnd && (
+          <TurnEndContainer>
+            {room.turn.usersGuessedThisTurn.map((user) => (
+              <span>
+                {user.name}
+                {` - ${user.score}`}
+              </span>
+            ))}
+          </TurnEndContainer>
+        )}
         <Header>
           <Timer
             src={

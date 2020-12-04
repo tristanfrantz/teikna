@@ -1,10 +1,7 @@
+import { User } from '@teikna/interfaces';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Room, User } from '@teikna/interfaces';
-import { UserMessage } from './Room.styles';
-import useSocketCanvas from '../../hooks/useSocketCanvas';
 import { RoomContext, SocketContext, UserContext } from '../../context';
-import { MessageEvent, RoomEvent } from '@teikna/enums';
 
 const List = styled.div`
   display: flex;
@@ -66,7 +63,6 @@ const Users = () => {
   useEffect(() => {
     const sortedUserList = Object.values(room.users).sort((a, b) => b.score - a.score);
     setUsers(sortedUserList);
-    console.log('sorting');
   }, [room]);
 
   return (

@@ -32,7 +32,7 @@ export interface Room {
   roundLimit: number;
   currentRound: number;
   drawTime: number;
-  hasGameStarted: boolean;
+  isGameInLobby: boolean;
   isUserDrawing: boolean;
   turn: Turn;
 }

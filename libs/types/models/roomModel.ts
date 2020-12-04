@@ -10,7 +10,7 @@ abstract class AbstractRoomModel implements Room {
   drawTime!: number;
   currentRound!: number;
   adminUserId!: string;
-  hasGameStarted!: boolean;
+  isGameInLobby!: boolean;
   isUserDrawing!: boolean;
   turn!: Turn;
 }
@@ -26,7 +26,7 @@ export class RoomModel extends AbstractRoomModel {
     this.drawTime = room.drawTime;
     this.currentRound = room.currentRound;
     this.adminUserId = room.adminUserId;
-    this.hasGameStarted = room.hasGameStarted;
+    this.isGameInLobby = room.isGameInLobby;
     this.isUserDrawing = room.isUserDrawing;
     this.turn = room.turn;
   }
@@ -36,14 +36,31 @@ export class TemplateRoomModel extends AbstractRoomModel {
   constructor(user: User, id: string) {
     super();
     this.id = id;
-    this.users = { [user.id]: user };
+    this.users = {};
     this.correctGuess = '';
     this.drawingUser = user;
     this.roundLimit = 3;
     this.drawTime = 50;
     this.currentRound = 1;
     this.adminUserId = user.id;
-    this.hasGameStarted = false;
+    this.isGameInLobby = true;
+    this.isUserDrawing = false;
+    this.turn = new TemplateTurnModel();
+  }
+}
+
+export class LobbyRoomModel extends AbstractRoomModel {
+  constructor(room: Room) {
+    super();
+    this.id = room.id;
+    this.users = room.users;
+    this.correctGuess = '';
+    this.drawingUser = room.drawingUser;
+    this.roundLimit = room.roundLimit;
+    this.drawTime = room.drawTime;
+    this.currentRound = 1;
+    this.adminUserId = room.adminUserId;
+    this.isGameInLobby = true;
     this.isUserDrawing = false;
     this.turn = new TemplateTurnModel();
   }

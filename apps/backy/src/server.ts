@@ -128,10 +128,11 @@ export default class ChatServer {
     const rooms = this.roomService.getRoomList();
     rooms.forEach((room) => {
       if (room.isUserDrawing) {
-        const usersLeftToGuess = this.roomService.getUsersLeftToGuessCount(room.id);
+        const hasEveryUserGuessed = this.roomService.hasEveryUserGuessed(room.id);
         const dateNow = new Date();
         const isDrawingTimeExpired = differenceInSeconds(dateNow, new Date(room.turn.startDateTime)) === room.drawTime;
-        if (usersLeftToGuess === 0 || isDrawingTimeExpired) {
+        console.log(hasEveryUserGuessed, isDrawingTimeExpired);
+        if (hasEveryUserGuessed || isDrawingTimeExpired) {
           console.log('turn should end, updating room and emitting now');
           this.roomService.handleTurnEnd(room.id);
 
@@ -145,6 +146,8 @@ export default class ChatServer {
 
   private emitThreeRandomWords = (roomId: string) => {
     const room = this.roomService.getRoom(roomId);
+    console.log(roomId);
+    console.log(room);
     if (room) {
       const threeRandomWords = this.roomService.getThreeRandomWords();
       this.io.to(room.drawingUser.id).emit(RoomEvent.WORDLIST, threeRandomWords);

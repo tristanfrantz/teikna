@@ -101,3 +101,11 @@ export const MessageInput = styled.input`
   border: 1px solid #ccc;
   border-radius: 4px;
 `;
+
+export const TurnEndContainer = styled.div`
+  width: 200px;
+  height: 200px;
+  border: 1px solid red;
+  display: flex;
+  flex-direction: column;
+`;

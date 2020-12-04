@@ -41,12 +41,9 @@ const Lobby = () => {
   useEffect(() => {
     if (room) {
       setCopyLink(`localhost:4200/room/${room.id}`);
-      /** if user isn't admin, these changes are recieved through socket */
-      if (!isAdmin) {
-        setRoundCount(room.roundLimit);
-        setDrawingTime(room.drawTime);
-        setGameStarted(room.hasGameStarted);
-      }
+      setRoundCount(room.roundLimit);
+      setDrawingTime(room.drawTime);
+      setGameStarted(!room.isGameInLobby);
     }
   }, [room]);
 
@@ -55,7 +52,6 @@ const Lobby = () => {
     if (room) {
       const updatedRoom: Room = { ...room, roundLimit: updatedRoundcount };
       socket.emit(RoomEvent.UPDATEROOM, updatedRoom);
-      setRoundCount(updatedRoundcount);
     }
   };
 
@@ -64,14 +60,12 @@ const Lobby = () => {
     if (room) {
       const updatedRoom: Room = { ...room, drawTime: updatedDrawtime };
       socket.emit(RoomEvent.UPDATEROOM, updatedRoom);
-      setDrawingTime(updatedDrawtime);
     }
   };
 
   const handleStartGame = () => {
     if (room) {
       socket.emit(RoomEvent.STARTGAME);
-      setGameStarted(true);
     }
   };
 
@@ -91,12 +85,6 @@ const Lobby = () => {
     );
   }
 
-  // if (room) {
-  //   if (room.hasGameStarted) {
-  //     return <ChatRoom roomId={room.id} />;
-  //   }
-  // }
-
   return (
     <Container>
       <SettingsCard isAdmin={isAdmin}>
@@ -104,10 +92,12 @@ const Lobby = () => {
         <SelectWrapper>
           <SelectLabel>Rounds</SelectLabel>
           <SelectInput name="roundCount" disabled={!isAdmin} onChange={handleRoundLimitChange} value={roundCount}>
+            <option value={1}>1</option>
             <option value={2}>2</option>
             <option value={3}>3</option>
             <option value={4}>4</option>
             <option value={5}>5</option>
+            <option value={6}>6</option>
           </SelectInput>
         </SelectWrapper>
         <SelectWrapper>
@@ -117,6 +107,8 @@ const Lobby = () => {
             <option value={40}>40 seconds</option>
             <option value={50}>50 seconds</option>
             <option value={60}>60 seconds</option>
+            <option value={70}>70 seconds</option>
+            <option value={80}>80 seconds</option>
           </SelectInput>
         </SelectWrapper>
         <StartGameButton disabled={!isAdmin} onClick={handleStartGame}>
