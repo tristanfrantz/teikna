@@ -1,7 +1,7 @@
+import { RoomContext, SocketContext, UserContext } from '@teikna/context';
 import { User } from '@teikna/interfaces';
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { RoomContext, SocketContext, UserContext } from '../../context';
 
 const List = styled.div`
   display: flex;
@@ -12,6 +12,7 @@ const List = styled.div`
 
 const UserList = styled(List)`
   width: 200px;
+  border: 1px solid red;
 `;
 
 const UserListItem = styled.div<{ hasGuessedWord: boolean }>`
@@ -54,6 +55,8 @@ const Score = styled.span`
   font-weight: 500;
 `;
 
+const users: User[] = [];
+
 const Users = () => {
   const socket = useContext(SocketContext);
   const room = useContext(RoomContext);
@@ -70,11 +73,11 @@ const Users = () => {
       {users.map((u: User, index: number) => (
         <UserListItem key={index} hasGuessedWord={u.hasGuessedWord}>
           <UserListItemRow>
-            <Username isSelf={u.id === user.id}>{u.name}</Username>
+            <Username isSelf={true}>{u.name}</Username>
             <Index>{`${index + 1}#`}</Index>
           </UserListItemRow>
           <UserListItemRow>
-            {/* <UserImage src={user.img} /> */}
+            <UserImage src={'https://i1.sndcdn.com/avatars-000508049637-rbt6an-t500x500.jpg'} />
             <Score>{u.score}</Score>
           </UserListItemRow>
         </UserListItem>

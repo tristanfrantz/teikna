@@ -6,7 +6,6 @@ import Container from '../../components/Container';
 const ContentWrapper = styled.div`
   width: 400px;
   height: 400px;
-  border: 1px solid red;
 `;
 
 const Input = styled.input`

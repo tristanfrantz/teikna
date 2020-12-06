@@ -80,6 +80,9 @@ export default class ChatServer {
               this.emitRoomInfo(room.id);
             } else if (messageSimilarity >= 0.8) {
               const closeGuessMessage = messageUtils.closeGuessMessage(message);
+              const userMessage = messageUtils.userMessage(message);
+
+              socket.to(room.id).broadcast.emit(MessageEvent.MESSAGE, userMessage);
               socket.emit(MessageEvent.MESSAGE, closeGuessMessage);
             } else {
               const userMessage = messageUtils.userMessage(message);
@@ -146,11 +149,12 @@ export default class ChatServer {
 
   private emitThreeRandomWords = (roomId: string) => {
     const room = this.roomService.getRoom(roomId);
-    console.log(roomId);
-    console.log(room);
+    console.log('about to emit words to ', room.drawingUser.name);
     if (room) {
       const threeRandomWords = this.roomService.getThreeRandomWords();
       this.io.to(room.drawingUser.id).emit(RoomEvent.WORDLIST, threeRandomWords);
+    } else {
+      console.log('didnt find a room :(');
     }
   };
 

@@ -1,8 +1,8 @@
 import React, { KeyboardEvent, ChangeEvent } from 'react';
-import useSocketChat from '../../hooks/useSocketChat';
 import { Message } from '@teikna/interfaces';
-import { UserMessage, MessageInput, MessageItem, MessageList, MessageSender, MessageWrapper } from './Room.styles';
+import { UserMessage, MessageInput, MessageItem, MessageList, MessageSender, MessageWrapper } from './Chat.styles';
 import { MessageType } from '@teikna/enums';
+import useSocketChat from '@teikna/hooks/useSocketChat';
 
 const Chat = () => {
   const { messages, sendMessage } = useSocketChat();
@@ -13,7 +13,7 @@ const Chat = () => {
   };
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && newMessage) {
       sendMessage(newMessage);
       setNewMessage('');
     }
@@ -21,7 +21,7 @@ const Chat = () => {
 
   return (
     <MessageWrapper>
-      <MessageList>
+      <MessageList id="messageList">
         {messages.map((message: Message, index: number) => {
           const { user, content, timestamp } = message;
           return (

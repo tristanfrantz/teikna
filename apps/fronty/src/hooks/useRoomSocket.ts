@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { MessageEvent, RoomEvent } from '@teikna/enums';
+import { RoomEvent } from '@teikna/enums';
 import { Room, User } from '@teikna/interfaces';
+import { useStore } from '@teikna/store';
 
 const SOCKET_SERVER_URL = 'http://localhost:8080/';
 
 const useRoomSocket = (roomId: string) => {
   const [socket] = useState<Socket>(io(SOCKET_SERVER_URL));
-  const [user, setUser] = useState<User>();
-  const [room, setRoom] = useState<Room>();
+  const { setWordList: setWordlist, setUser, setRoom } = useStore();
 
   useEffect(() => {
     socket.on(RoomEvent.CONNECT, () => {
@@ -25,24 +25,26 @@ const useRoomSocket = (roomId: string) => {
         socket.emit(RoomEvent.JOINROOM, user);
         setUser(user);
       } else {
-        console.log('creating room in client');
         socket.emit(RoomEvent.CREATEROOM, user);
       }
 
       socket.on(RoomEvent.ROOMINFO, (roomInfo: Room) => {
+        /** TODO: fix this, should only set user if user created room */
         setUser({ ...user, roomId: roomInfo.id });
         setRoom(roomInfo);
       });
+
+      socket.on(RoomEvent.WORDLIST, (words: string[]) => {
+        setWordlist(words);
+      });
     });
 
-    // Disconnect socket when hook unmounts
     return () => {
-      console.log('disconnecting socket inside useRoomSocket hook');
       socket.disconnect();
     };
   }, [socket]);
 
-  return { socket, user, room };
+  return socket;
 };
 
 export default useRoomSocket;

@@ -21,7 +21,10 @@
     "paths": {
       "@teikna/interfaces": ["libs/types/interfaces/index.ts"],
       "@teikna/enums": ["libs/types/enums/index.ts"],
-      "@teikna/models": ["libs/types/models/index.ts"]
+      "@teikna/models": ["libs/types/models/index.ts"],
+      "@teikna/*": [
+        "apps/fronty/src/*"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

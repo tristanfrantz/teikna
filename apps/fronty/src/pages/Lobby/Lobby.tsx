@@ -1,5 +1,7 @@
+import { Loading } from '@teikna/components/Loading';
 import { RoomEvent } from '@teikna/enums';
 import { Room } from '@teikna/interfaces';
+import { useStore } from '@teikna/store';
 import { round } from 'lodash';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
@@ -26,11 +28,11 @@ const Lobby = () => {
   const [roundCount, setRoundCount] = useState(3);
   const [drawingTime, setDrawingTime] = useState(50);
   const [copyLink, setCopyLink] = useState('');
-
   const [gameStarted, setGameStarted] = useState(false);
 
   const { roomId } = useParams<RoomRouteParams>();
-  const { socket, user, room } = useRoomSocket(roomId);
+  const socket = useRoomSocket(roomId);
+  const { room, user } = useStore();
 
   useEffect(() => {
     if (room && user) {
@@ -70,7 +72,7 @@ const Lobby = () => {
   };
 
   if (!room) {
-    return <div>crapper! no room!</div>;
+    return <Loading />;
   }
 
   if (gameStarted && user) {

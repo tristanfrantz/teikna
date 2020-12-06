@@ -1,5 +1,5 @@
+import useSocketCanvas from '@teikna/hooks/useSocketCanvas';
 import React, { useEffect } from 'react';
-import useSocketCanvas from '../../hooks/useSocketCanvas';
 
 const DrawingBoard = () => {
   const { canvasRef } = useSocketCanvas();
