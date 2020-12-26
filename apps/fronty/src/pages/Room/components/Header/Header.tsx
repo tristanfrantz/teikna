@@ -20,24 +20,26 @@ const Header = () => {
 
   const { room } = useStore();
   const socket = useContext(SocketContext);
-  const [turnTimer, setTurnTimer] = useState(room.drawTime);
+  const [turnTimer, setTurnTimer] = useState(room?.drawTime ?? 50);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (room.isUserDrawing) {
-        const diff = differenceInSeconds(new Date(), new Date(room.turn.startDateTime));
-        const newRounderTimer = Math.min(Math.max(turnTimer - diff, 0), room.drawTime);
-        setTurnTimer(newRounderTimer);
-      }
-    }, 900);
+    if (room) {
+      const interval = setInterval(() => {
+        if (room.isUserDrawing) {
+          const diff = differenceInSeconds(new Date(), new Date(room.turn.startDateTime));
+          const newRounderTimer = Math.min(Math.max(turnTimer - diff, 0), room.drawTime);
+          setTurnTimer(newRounderTimer);
+        }
+      }, 900);
 
-    return () => clearInterval(interval);
-  }, [room.turn?.startDateTime]);
+      return () => clearInterval(interval);
+    }
+  }, [room?.turn?.startDateTime]);
 
   return (
     <HeaderContainer>
       <RoundWrapper>
-        <Round>{`Round ${room.currentRound} of ${room.roundLimit}`}</Round>
+        <Round>{`Round ${room?.currentRound} of ${room?.roundLimit}`}</Round>
       </RoundWrapper>
       <ClockWordWrapper>
         <Round>{turnTimer}</Round>

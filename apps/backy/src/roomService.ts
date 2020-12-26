@@ -44,9 +44,9 @@ export class RoomService {
 
   public joinRoom = (user: User) => {
     const { id, roomId } = user;
-    const userRoom = this.rooms[roomId];
-    if (userRoom) {
-      const users = userRoom.users;
+    const room = this.rooms[roomId];
+    if (room) {
+      const users = room.users;
       users[id] = user;
     }
   };
@@ -54,6 +54,13 @@ export class RoomService {
   public leaveRoom = (user: User) => {
     const room = this.rooms[user.roomId];
     if (room) {
+      const drawingUser = room.drawingUser;
+      if (drawingUser.id === user.id) {
+        this.handleTurnEnd(room.id);
+      }
+      if (drawingUser.id === room.adminUserId) {
+        this.switchAdminUser(room.id);
+      }
       delete room.users[user.id];
     }
   };
@@ -72,30 +79,22 @@ export class RoomService {
   public handleTurnEnd = (roomId: string) => {
     const room = this.rooms[roomId];
     if (room) {
-      const userList = Object.values(room.users).map((user) => user);
-      const currentDrawer = room.drawingUser;
-      if (currentDrawer) {
-        const indexOfCurrentDrawer = userList.findIndex((user) => user.id === currentDrawer.id);
-        const indexOfNewDrawer = indexOfCurrentDrawer === userList.length - 1 ? 0 : indexOfCurrentDrawer + 1;
-        const newDrawer = userList[indexOfNewDrawer];
-        room.drawingUser = newDrawer;
-        room.isUserDrawing = false;
+      this.switchDrawingUser(roomId);
 
-        const shouldIncrementRound = this.hasEveryUserDrawn(room.id);
-        if (shouldIncrementRound) {
-          if (room.currentRound === room.roundLimit) {
-            this.handleGameEnd(roomId);
-            return;
-          }
-          this.handleRoundEnd(roomId);
+      const shouldIncrementRound = this.hasEveryUserDrawn(room.id);
+      if (shouldIncrementRound) {
+        if (room.currentRound === room.roundLimit) {
+          this.handleGameEnd(roomId);
+          return;
         }
-
-        Object.keys(room.users).forEach((userId) => {
-          room.users[userId].hasGuessedWord = false;
-        });
-
-        this.incrementUserScores(roomId);
+        this.handleRoundEnd(roomId);
       }
+
+      Object.keys(room.users).forEach((userId) => {
+        room.users[userId].hasGuessedWord = false;
+      });
+
+      this.incrementUserScores(roomId);
     }
   };
 
@@ -113,13 +112,15 @@ export class RoomService {
     const room = this.rooms[roomId];
     const user = room.users[userId];
 
-    user.hasGuessedWord = true;
-    const dateNow = new Date();
-    const secondsLeftToGuess = room.drawTime - differenceInSeconds(dateNow, new Date(room.turn.startDateTime));
-    const calculatedGuessScore = 10 * secondsLeftToGuess;
+    if (room && user) {
+      user.hasGuessedWord = true;
+      const dateNow = new Date();
+      const secondsLeftToGuess = room.drawTime - differenceInSeconds(dateNow, new Date(room.turn.startDateTime));
+      const calculatedGuessScore = 10 * secondsLeftToGuess;
 
-    const turnUser: TurnUser = new TurnUserModel(user, calculatedGuessScore);
-    room.turn.usersGuessedThisTurn.push(turnUser);
+      const turnUser: TurnUser = new TurnUserModel(user, calculatedGuessScore);
+      room.turn.usersGuessedThisTurn.push(turnUser);
+    }
   };
 
   public getThreeRandomWords = () => {
@@ -154,9 +155,9 @@ export class RoomService {
     });
   };
 
+  /** reset game and send users back to lobby */
   private handleGameEnd = (roomId: string) => {
-    const room = this.getRoom(roomId);
-
+    const room = this.rooms[roomId];
     Object.keys(room.users).forEach((userId) => {
       const user = room.users[userId];
       room.users[userId] = new LobbyUserModel(user);
@@ -172,5 +173,34 @@ export class RoomService {
     Object.keys(room.users).forEach((userId) => {
       room.users[userId].hasDrawnInCurrentRound = false;
     });
+  };
+
+  /** when a turn ends, change the current drawer in the room */
+  private switchDrawingUser = (roomId: string) => {
+    const room = this.rooms[roomId];
+    const currentDrawer = room.drawingUser;
+    const userList = Object.values(room.users).map((user) => user);
+
+    const indexOfCurrentDrawer = userList.findIndex((user) => user.id === currentDrawer.id);
+    const indexOfNewDrawer = indexOfCurrentDrawer === userList.length - 1 ? 0 : indexOfCurrentDrawer + 1;
+    const newDrawer = userList[indexOfNewDrawer];
+
+    room.drawingUser = newDrawer;
+    room.isUserDrawing = false;
+  };
+
+  /** if admin user leaves a room, op a different user */
+  private switchAdminUser = (roomId: string) => {
+    const room = this.rooms[roomId];
+    const currentAdminId = room.adminUserId;
+    const userList = Object.values(room.users).map((user) => user);
+
+    const indexOfCurrentAdmin = userList.findIndex((user) => user.id === currentAdminId);
+    const indexOfNewAdmin = indexOfCurrentAdmin === userList.length - 1 ? 0 : indexOfCurrentAdmin + 1;
+    const newAdminUser = userList[indexOfNewAdmin];
+
+    if (newAdminUser) {
+      room.adminUserId = newAdminUser.id;
+    }
   };
 }
