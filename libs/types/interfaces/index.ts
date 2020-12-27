@@ -35,6 +35,7 @@ export interface Room {
 export interface Turn {
   startDateTime: Date;
   usersGuessedThisTurn: TurnUser[];
+  draws: Array<DrawData>;
 }
 
 export interface TurnUser {

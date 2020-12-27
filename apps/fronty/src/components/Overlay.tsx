@@ -61,13 +61,13 @@ interface Props {
 }
 
 const Overlay: React.FC<Props> = ({ children, isOpen }) => {
-  return (
+  return isOpen ? (
     <OverlayWrapper>
       <TransitionWrapper isOpen={isOpen}>
         <Content>{children}</Content>
       </TransitionWrapper>
     </OverlayWrapper>
-  );
+  ) : null;
 };
 
 export default Overlay;

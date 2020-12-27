@@ -1,4 +1,4 @@
-import { Room, TurnUser, User } from '@teikna/interfaces';
+import { DrawData, Room, TurnUser, User } from '@teikna/interfaces';
 import { words } from './words';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -138,6 +138,15 @@ export class RoomService {
     return userList.every((user) => user.hasGuessedWord);
   };
 
+  /** adds draw data to turn draws array that is emmited when user joins */
+  public handleDraw = (data: DrawData, roomId: string) => {
+    const room = this.getRoom(roomId);
+    if (room?.turn?.draws) {
+      room.turn.draws.push(data);
+      console.log("room turn total draws", room.turn.draws.length);
+    }
+  }
+
   private hasEveryUserDrawn = (roomId: string) => {
     const room = this.rooms[roomId];
     const userList = Object.values(room.users);
@@ -174,13 +183,6 @@ export class RoomService {
       room.users[userId].hasDrawnInCurrentRound = false;
     });
   };
-
-  /** should handle storing draw queue that is emmited when user joins */
-  // private handleDraw = (roomId: string) => {
-  //   const room = this.getRoom(roomId);
-
-
-  // }
 
   /** when a turn ends, change the current drawer in the room */
   private switchDrawingUser = (roomId: string) => {

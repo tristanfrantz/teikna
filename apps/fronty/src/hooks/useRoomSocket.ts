@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { RoomEvent } from '@teikna/enums';
-import { Room, User } from '@teikna/interfaces';
+import { CanvasEvent, RoomEvent } from '@teikna/enums';
+import { DrawData, Room, User } from '@teikna/interfaces';
 import { useStore } from '@teikna/store';
 
 const SOCKET_SERVER_URL = 'http://localhost:8080/';

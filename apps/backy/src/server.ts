@@ -3,6 +3,7 @@ import express from 'express';
 import { Server as SocketServer, Socket } from 'socket.io';
 import { RoomEvent, MessageEvent, CanvasEvent } from '@teikna/enums';
 import { DrawData, Message, Room, User } from '@teikna/interfaces';
+import { delay } from 'lodash';
 
 import { RoomService } from './roomService';
 import cors from 'cors';
@@ -50,6 +51,7 @@ export default class ChatServer {
 
         this.roomService.joinRoom(user);
         this.emitRoomInfo(user.roomId);
+        this.emitTurnDraws(user);
       });
 
       socket.on(RoomEvent.CREATEROOM, (user: User) => {
@@ -94,10 +96,12 @@ export default class ChatServer {
 
       socket.on(CanvasEvent.DRAW, (data: DrawData) => {
         const user = this.users[socket.id];
-        if (user?.roomId) {
-          // this.roomService.handleDraw();
-          socket.to(user.roomId).emit(CanvasEvent.DRAW, data);
+        if (!user) {
+          return;
         }
+        const { roomId } = user;
+        this.roomService.handleDraw(data, roomId);
+        socket.to(user.roomId).emit(CanvasEvent.DRAW, data);
       });
 
       socket.on(RoomEvent.DISCONNECT, () => {
@@ -176,5 +180,16 @@ export default class ChatServer {
     if (room) {
       this.io.to(room.id).emit(RoomEvent.ROOMINFO, room);
     }
+  };
+
+  private emitTurnDraws = (user: User) => {
+    const { id: userId, roomId } = user;
+    const room = this.roomService.getRoom(roomId);
+
+    delay(() => {
+      room?.turn?.draws?.forEach(async (data: DrawData) => {
+        this.io.to(userId).emit(CanvasEvent.DRAW, data)
+      })
+    }, 1000);
   };
 }
