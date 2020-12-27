@@ -43,14 +43,7 @@ const Header = () => {
       </RoundWrapper>
       <ClockWordWrapper>
         <Round>{turnTimer}</Round>
-        <WordWrapper>
-          {word.map((letter, index) => (
-            <LetterWrapper key={index}>
-              <Letter>{letter}</Letter>
-              {/* <Underscore>{'_'}</Underscore> */}
-            </LetterWrapper>
-          ))}
-        </WordWrapper>
+        <WordWrapper></WordWrapper>
       </ClockWordWrapper>
     </HeaderContainer>
   );

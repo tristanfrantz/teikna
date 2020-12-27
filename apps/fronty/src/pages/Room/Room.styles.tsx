@@ -1,12 +1,11 @@
 import styled from 'styled-components';
 
 export const RoomWrapper = styled.div`
-  width: 1400px;
+  width: 1600px;
   height: 800px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid black;
 `;
 
 export const ContentWrapper = styled.div`
@@ -20,7 +19,7 @@ export const ContentWrapper = styled.div`
 `;
 
 export const CanvasWrapper = styled.div`
-  width: 900px;
+  width: 1300px;
   height: 100%;
   position: relative;
 `;

@@ -20,7 +20,7 @@ const DrawingBoard = () => {
       id="canvas"
       ref={canvasRef}
       style={{
-        border: '2px solid #000',
+        border: '1px solid #000',
       }}
     />
   );

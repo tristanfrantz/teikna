@@ -1,11 +1,13 @@
 import { Loading } from '@teikna/components/Loading';
+import { SocketContext } from '@teikna/context';
+import { RoomEvent } from '@teikna/enums';
 import { useStore } from '@teikna/store';
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Container from '../../components/Container';
+import TurnEnd from '../TurnEnd/TurnEnd';
 import Chat from './components/Chat/Chat';
 import DrawingBoard from './components/DrawingBoard';
 import Header from './components/Header/Header';
-import Overlay from './components/Overlay/Overlay';
 import Users from './components/Users';
 import { CanvasWrapper, ContentWrapper, RoomWrapper } from './Room.styles';
 
@@ -17,7 +19,7 @@ const ChatRoom = () => {
         <ContentWrapper>
           <Users />
           <CanvasWrapper>
-            <Overlay />
+            <TurnEnd />
             <DrawingBoard />
           </CanvasWrapper>
           <Chat />

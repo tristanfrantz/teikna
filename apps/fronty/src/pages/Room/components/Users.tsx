@@ -12,7 +12,6 @@ const List = styled.div`
 
 const UserList = styled(List)`
   width: 200px;
-  border: 1px solid red;
 `;
 
 const UserListItem = styled.div<{ hasGuessedWord: boolean }>`
