@@ -1,16 +1,11 @@
 import { MessageType } from '@teikna/enums';
-
-export interface Coordinates {
-  x: number;
-  y: number;
-}
-
 export interface DrawData {
-  start: Coordinates;
-  end: Coordinates;
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
   color: string;
   lineWidth: number;
-  room: string;
 }
 
 export interface User {

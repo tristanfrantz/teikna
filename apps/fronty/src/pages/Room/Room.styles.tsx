@@ -22,5 +22,4 @@ export const ContentWrapper = styled.div`
 export const CanvasWrapper = styled.div`
   width: 900px;
   height: 100%;
-  position: relative;
 `;

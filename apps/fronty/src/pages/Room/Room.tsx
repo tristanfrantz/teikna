@@ -3,7 +3,7 @@ import { useStore } from '@teikna/store';
 import React from 'react';
 import Container from '../../components/Container';
 import Chat from './components/Chat/Chat';
-import DrawingBoard from './components/DrawingBoard';
+import Canvas from './components/Canvas';
 import Header from './components/Header/Header';
 import Overlay from './components/Overlay/Overlay';
 import Users from './components/Users';
@@ -18,7 +18,7 @@ const ChatRoom = () => {
           <Users />
           <CanvasWrapper>
             <Overlay />
-            <DrawingBoard />
+            <Canvas />
           </CanvasWrapper>
           <Chat />
         </ContentWrapper>

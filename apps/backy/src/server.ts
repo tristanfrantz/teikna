@@ -93,7 +93,11 @@ export default class ChatServer {
       });
 
       socket.on(CanvasEvent.DRAW, (data: DrawData) => {
-        // this.roomService.handleDraw(data, socket);
+        const user = this.users[socket.id];
+        if (user?.roomId) {
+          // this.roomService.handleDraw();
+          socket.to(user.roomId).emit(CanvasEvent.DRAW, data);
+        }
       });
 
       socket.on(RoomEvent.DISCONNECT, () => {

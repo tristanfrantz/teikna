@@ -173,4 +173,10 @@ export class RoomService {
       room.users[userId].hasDrawnInCurrentRound = false;
     });
   };
+
+  // private handleDraw = (roomId: string) => {
+  //   const room = this.getRoom(roomId);
+
+
+  // }
 }

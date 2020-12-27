@@ -2,8 +2,8 @@ import { Room, User } from '@teikna/interfaces';
 import create from 'zustand';
 
 type State = {
-  user: User | null;
-  room: Room | null;
+  user?: User;
+  room?: Room;
   wordList: string[];
   setUser: (user: User) => void;
   setRoom: (room: Room) => void;
@@ -11,8 +11,8 @@ type State = {
 };
 
 export const useStore = create<State>((set) => ({
-  user: null,
-  room: null,
+  user: undefined,
+  room: undefined,
   wordList: [],
   setUser: (user) => set(() => ({ user })),
   setRoom: (room) => set(() => ({ room })),
