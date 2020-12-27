@@ -7,7 +7,6 @@ export const HeaderContainer = styled(Card)`
   align-items: center;
   width: 100%;
   height: 100px;
-  border: 1px solid red;
   position: relative;
 `;
 

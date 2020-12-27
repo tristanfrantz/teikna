@@ -12,7 +12,6 @@ const List = styled.div`
 
 const UserList = styled(List)`
   width: 200px;
-  border: 1px solid red;
 `;
 
 const UserListItem = styled.div<{ hasGuessedWord: boolean }>`
@@ -55,8 +54,6 @@ const Score = styled.span`
   font-weight: 500;
 `;
 
-const users: User[] = [];
-
 const Users = () => {
   const socket = useContext(SocketContext);
   const room = useContext(RoomContext);
@@ -73,7 +70,7 @@ const Users = () => {
       {users.map((u: User, index: number) => (
         <UserListItem key={index} hasGuessedWord={u.hasGuessedWord}>
           <UserListItemRow>
-            <Username isSelf={true}>{u.name}</Username>
+            <Username isSelf={true}>{u.id === room.adminUserId ? `${u.name} ADMIN` : u.name}</Username>
             <Index>{`${index + 1}#`}</Index>
           </UserListItemRow>
           <UserListItemRow>
