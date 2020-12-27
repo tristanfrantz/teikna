@@ -7,9 +7,10 @@ import { DrawModel } from '@teikna/models';
 import styled from 'styled-components';
 
 const StyledCanvas = styled.canvas`
+  height: 100%;
+  width: 100%;
   border: 1px solid black;
 `
-
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const socket = useContext(SocketContext);
@@ -18,13 +19,28 @@ const Canvas = () => {
   const [offsetY, setOffsetY] = useState(0);
 
   useEffect(() => {
-    socket.on(CanvasEvent.DRAW, (data: DrawData) => {
-      const ctx = canvasRef.current?.getContext('2d');
-      if (ctx) {
-        drawLine(ctx, data);
-      }
-    })
+    resizeCanvas()
+    canvasRef.current?.addEventListener('resize', resizeCanvas, false);
+    const ctx = canvasRef.current?.getContext('2d');
+    if (ctx) {
+      socket.on(CanvasEvent.DRAW, (data: DrawData) => {
+        drawLine(ctx, data)
+      });
+    }
   }, [])
+
+  const resizeCanvas = () => {
+    const canvas = canvasRef?.current;
+    if (canvas) {
+      const { width, height } = canvas.getBoundingClientRect()
+      canvas.width = width
+      canvas.height = height
+      // some magic code for devices with high pixel density
+      // const ctx = canvas.getContext('2d');
+      // const { devicePixelRatio:ratio=1 } = window
+      // ctx?.scale(ratio, ratio)
+    }
+  }
 
   const drawLine = (ctx: CanvasRenderingContext2D, data: DrawData) => {
     const { x0, y0, x1, y1, color, lineWidth } = data;

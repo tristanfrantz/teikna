@@ -19,7 +19,7 @@ const ChatRoom = () => {
         <ContentWrapper>
           <Users />
           <CanvasWrapper>
-            <TurnEnd />
+            {/* <TurnEnd /> */}
             <Canvas />
           </CanvasWrapper>
           <Chat />
