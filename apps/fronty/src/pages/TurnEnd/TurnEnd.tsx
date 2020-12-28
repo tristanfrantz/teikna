@@ -2,22 +2,15 @@ import { Loading } from '@teikna/components/Loading';
 import Overlay from '@teikna/components/Overlay';
 import { SocketContext } from '@teikna/context';
 import { RoomEvent } from '@teikna/enums';
-import { useStore } from '@teikna/store';
+import { extractIsUserDrawing, useStore } from '@teikna/store';
 import React, { useContext, useEffect, useState } from 'react';
 import Container from '../../components/Container';
 import { WordList } from './components/WordList';
 
 const TurnEnd = () => {
-  const [isUserDrawing, setIsUserDrawing] = useState(false);
   const [openOverlay, setOpenOverlay] = useState(false);
-
-  const { wordList, room, user } = useStore();
-
-  useEffect(() => {
-    if (user && room) {
-      setIsUserDrawing(room.drawingUser.id === user.id);
-    }
-  }, [room]);
+  const { wordList } = useStore();
+  const isUserDrawing = useStore(state => extractIsUserDrawing(state));
 
   useEffect(() => {
     if (wordList.length) {

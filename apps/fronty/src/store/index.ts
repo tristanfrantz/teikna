@@ -10,7 +10,7 @@ type State = {
   setWordList: (words: string[]) => void;
 };
 
-export const useStore = create<State>((set) => ({
+export const useStore = create<State>((set, get) => ({
   user: undefined,
   room: undefined,
   wordList: [],
@@ -18,3 +18,13 @@ export const useStore = create<State>((set) => ({
   setRoom: (room) => set(() => ({ room })),
   setWordList: (wordList) => set(() => ({ wordList })),
 }));
+
+
+// extractors
+export const extractIsUserDrawing = (state: State) => {
+  const { room, user } = state;
+  if (!room || !user) {
+    return false
+  }
+  return room.drawingUser.id === user.id;
+}

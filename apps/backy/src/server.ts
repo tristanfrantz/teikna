@@ -51,7 +51,6 @@ export default class ChatServer {
 
         this.roomService.joinRoom(user);
         this.emitRoomInfo(user.roomId);
-        this.emitTurnDraws(user);
       });
 
       socket.on(RoomEvent.CREATEROOM, (user: User) => {
@@ -142,7 +141,6 @@ export default class ChatServer {
         const hasEveryUserGuessed = this.roomService.hasEveryUserGuessed(room.id);
         const dateNow = new Date();
         const isDrawingTimeExpired = differenceInSeconds(dateNow, new Date(room.turn.startDateTime)) === room.drawTime;
-        console.log(hasEveryUserGuessed, isDrawingTimeExpired);
         if (hasEveryUserGuessed || isDrawingTimeExpired) {
           console.log('turn should end, updating room and emitting now');
           this.roomService.handleTurnEnd(room.id);
@@ -172,6 +170,7 @@ export default class ChatServer {
       const turnEndMessage = messageUtils.turnEndMessage(room.correctGuess);
       this.io.to(room.id).emit(MessageEvent.MESSAGE, turnEndMessage);
       this.io.to(room.id).emit(RoomEvent.TURNEND);
+      this.io.to(room.id).emit(CanvasEvent.CLEAR);
     }
   };
 
@@ -180,16 +179,5 @@ export default class ChatServer {
     if (room) {
       this.io.to(room.id).emit(RoomEvent.ROOMINFO, room);
     }
-  };
-
-  private emitTurnDraws = (user: User) => {
-    const { id: userId, roomId } = user;
-    const room = this.roomService.getRoom(roomId);
-
-    delay(() => {
-      room?.turn?.draws?.forEach(async (data: DrawData) => {
-        this.io.to(userId).emit(CanvasEvent.DRAW, data)
-      })
-    }, 1000);
   };
 }

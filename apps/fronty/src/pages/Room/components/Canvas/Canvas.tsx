@@ -5,6 +5,7 @@ import { DrawData } from '@teikna/interfaces';
 import { throttle } from 'lodash';
 import { DrawModel } from '@teikna/models';
 import styled from 'styled-components';
+import { extractIsUserDrawing, useStore } from '@teikna/store';
 
 const StyledCanvas = styled.canvas`
   height: 100%;
@@ -17,15 +18,25 @@ const Canvas = () => {
   const [drawing, setDrawing] = useState(false);
   const [offsetX, setOffsetX] = useState(0);
   const [offsetY, setOffsetY] = useState(0);
+  const room = useStore(state => state.room);
+  const isUserDrawing = useStore(state => extractIsUserDrawing(state));
 
   useEffect(() => {
     resizeCanvas()
     canvasRef.current?.addEventListener('resize', resizeCanvas, false);
     const ctx = canvasRef.current?.getContext('2d');
     if (ctx) {
+      room?.turn?.draws?.forEach((data: DrawData) => {
+        drawLine(ctx, data);
+      })
+
       socket.on(CanvasEvent.DRAW, (data: DrawData) => {
         drawLine(ctx, data)
       });
+
+      socket.on(CanvasEvent.CLEAR, () => {
+        clearCanvas();
+      })
     }
   }, [])
 
@@ -39,6 +50,14 @@ const Canvas = () => {
       // const ctx = canvas.getContext('2d');
       // const { devicePixelRatio:ratio=1 } = window
       // ctx?.scale(ratio, ratio)
+    }
+  }
+
+  const clearCanvas = () => {
+    const canvas = canvasRef?.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      ctx?.clearRect(0, 0, canvas.width, canvas.height);
     }
   }
 
@@ -64,7 +83,7 @@ const Canvas = () => {
   };
 
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
-    if (!drawing) {
+    if (!drawing || !isUserDrawing) {
       return;
     }
 
