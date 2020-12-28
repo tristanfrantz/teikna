@@ -24,13 +24,14 @@ const Header = () => {
 
   useEffect(() => {
     if (room) {
+      console.log("new interval is created");
       const interval = setInterval(() => {
         if (room.isUserDrawing) {
           const diff = differenceInSeconds(new Date(), new Date(room.turn.startDateTime));
-          const newRounderTimer = Math.min(Math.max(turnTimer - diff, 0), room.drawTime);
-          setTurnTimer(newRounderTimer);
+          const newTurnTimer = Math.max(0, Math.min(room.drawTime - diff, room.drawTime));
+          setTurnTimer(newTurnTimer);
         }
-      }, 900);
+      }, 500);
 
       return () => clearInterval(interval);
     }

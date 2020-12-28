@@ -3,7 +3,6 @@ import express from 'express';
 import { Server as SocketServer, Socket } from 'socket.io';
 import { RoomEvent, MessageEvent, CanvasEvent } from '@teikna/enums';
 import { DrawData, Message, Room, User } from '@teikna/interfaces';
-import { delay } from 'lodash';
 
 import { RoomService } from './roomService';
 import cors from 'cors';

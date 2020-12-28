@@ -105,6 +105,7 @@ const Lobby = () => {
         <SelectWrapper>
           <SelectLabel>Draw time</SelectLabel>
           <SelectInput name="drawTime" disabled={!isAdmin} onChange={handleDrawTimeChange} value={drawingTime}>
+            <option value={5}>5 seconds</option>
             <option value={30}>30 seconds</option>
             <option value={40}>40 seconds</option>
             <option value={50}>50 seconds</option>
